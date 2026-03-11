@@ -14,20 +14,22 @@ os.environ['KAGGLE_KEY'] = "2441e6151493c4f695ecea6a87bbd94b"
 
 print("📥 Скачиваем данные с Kaggle (The Movies Dataset)...")
 
+os.makedirs('data', exist_ok=True)
+
 # Проверяем наличие распакованного файла
-if not os.path.exists('movies_metadata.csv'):
+if not os.path.exists('data/movies_metadata.csv'):
     # Если архива нет, скачиваем
-    if not os.path.exists('the-movies-dataset.zip'):
+    if not os.path.exists('data/the-movies-dataset.zip'):
         print("⏳ Начало загрузки (около 200-900 МБ). Не прерывайте процесс!")
         subprocess.run([
-            "kaggle", "datasets", "download", "-d", "rounakbanik/the-movies-dataset"
+            "kaggle", "datasets", "download", "-d", "rounakbanik/the-movies-dataset", "-p", "data"
         ], check=True)
 
     # Если архив есть (скачан только что или ранее), распаковываем
-    if os.path.exists('the-movies-dataset.zip'):
+    if os.path.exists('data/the-movies-dataset.zip'):
         print("📦 Распаковка архива...")
-        with zipfile.ZipFile('the-movies-dataset.zip', 'r') as zip_ref:
-            zip_ref.extractall('.')
+        with zipfile.ZipFile('data/the-movies-dataset.zip', 'r') as zip_ref:
+            zip_ref.extractall('data')
     else:
         print("❌ Не удалось скачать архив. Проверьте соединение.")
 else:
@@ -35,9 +37,9 @@ else:
 
 print("⚙️ Обрабатываем датасет...")
 
-if os.path.exists('movies_metadata.csv') and os.path.exists('ratings.csv'):
+if os.path.exists('data/movies_metadata.csv') and os.path.exists('data/ratings.csv'):
     # Читаем метаданные фильмов
-    df_movies = pd.read_csv('movies_metadata.csv', usecols=['id', 'title', 'overview'], low_memory=False)
+    df_movies = pd.read_csv('data/movies_metadata.csv', usecols=['id', 'title', 'overview'], low_memory=False)
 
     # Очистка данных
     df_movies = df_movies[df_movies['id'].str.isnumeric() == True]
@@ -47,7 +49,7 @@ if os.path.exists('movies_metadata.csv') and os.path.exists('ratings.csv'):
     df_movies = df_movies.dropna(subset=['overview', 'title']) # Убираем пустые
 
     # Читаем рейтинги
-    df_ratings = pd.read_csv('ratings.csv', usecols=['userId', 'movieId', 'rating'])
+    df_ratings = pd.read_csv('data/ratings.csv', usecols=['userId', 'movieId', 'rating'])
     df_ratings_1m = df_ratings.head(1000000) # Берем первый 1М взаимодействий
 
     # Синхронизация ID

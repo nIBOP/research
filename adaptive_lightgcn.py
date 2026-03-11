@@ -3,33 +3,74 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pandas as pd
 from recbole.model.general_recommender.lightgcn import LightGCN
+from recbole.trainer import Trainer
+from recbole.utils import set_color, get_gpu_usage
+from torch.nn.utils import clip_grad_norm_
 
-class VerboseDataLoader:
-    def __init__(self, dataloader, interval=50):
-        self.dataloader = dataloader
-        self.interval = interval
-        self.total = len(dataloader) if hasattr(dataloader, '__len__') else "?"
+class CustomTrainer(Trainer):
+    def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
+        """Переопределяем метод для вывода логов батчей вместо progress bar"""
+        self.model.train()
+        loss_func = loss_func or self.model.calculate_loss
+        total_loss = None
+        
+        batch_interval = 50  # Интервал печати логов
+        total_batches = len(train_data)
+        
+        for batch_idx, interaction in enumerate(train_data):
+            # ВАЖНО: нужно обновлять внутренние структуры RecBole, иначе он будет сэмплировать одно и то же!
+            if hasattr(train_data, 'pr_end') and batch_idx == total_batches - 1:
+                train_data.pr_end() # Говорим даталоадеру, что эпоха закончилась и нужно сделать shuffle/resample
 
-    def __iter__(self):
-        for i, batch in enumerate(self.dataloader):
-            if i > 0 and i % self.interval == 0:
-                print(f"    ... batch {i}/{self.total}")
-            yield batch
+            interaction = interaction.to(self.device)
+            self.optimizer.zero_grad()
+            losses = loss_func(interaction)
+            
+            # Обработка кортежа потерь
+            if isinstance(losses, tuple):
+                loss = losses[0]  # Суммарный лосс для backward
+                loss_bpr = losses[1].item()
+                loss_sem = losses[2].item()
+                
+                loss_tuple = tuple(per_loss.item() for per_loss in losses)
+                total_loss = loss_tuple if total_loss is None else tuple(map(sum, zip(total_loss, loss_tuple)))
+            else:
+                loss = losses
+                loss_bpr = loss.item()
+                loss_sem = 0.0
+                total_loss = losses.item() if total_loss is None else total_loss + losses.item()
+                
+            self._check_nan(loss)
+            loss.backward()
+            
+            if self.clip_grad_norm:
+                clip_grad_norm_(self.model.parameters(), **self.clip_grad_norm)
+            self.optimizer.step()
+                
+            # --- НАШИ ЛОГИ: выводим без засорения памяти ---
+            if batch_idx > 0 and batch_idx % batch_interval == 0:
+                print(f"   [Epoch {epoch_idx}] batch {batch_idx}/{total_batches} | Loss: {loss.item():.4f} (BPR: {loss_bpr:.4f}, Sem: {loss_sem:.4f})")
+        
+        # Красивый вывод с учетом того, что total_loss может быть кортежем
+        if isinstance(total_loss, tuple):
+            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {total_loss[0]:.4f} (BPR: {total_loss[1]:.4f}, Sem: {total_loss[2]:.4f})")
+        else:
+            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {total_loss:.4f}")
+        return total_loss
 
-    def __len__(self):
-        return len(self.dataloader)
-
-    def __getattr__(self, name):
-        return getattr(self.dataloader, name)
+    def _valid_epoch(self, valid_data, show_progress=False):
+        """Переопределяем _valid_epoch, чтобы выводить результаты валидации"""
+        valid_score, valid_result = super()._valid_epoch(valid_data, show_progress=False)
+        print(f"📈 [Validation] Метрики: {valid_result}")
+        return valid_score, valid_result
 
 class AdaptiveLightGCN(LightGCN):
     def __init__(self, config, dataset):
         super(AdaptiveLightGCN, self).__init__(config, dataset)
-        self.centroids_path = config.get('centroids_path', 'cluster_centroids.pt')
+        self.centroids_path = config['centroids_path']
+        self.cl_weight = config['proto_reg_weight']
+        self.tau = config['temperature']
         self.item_mapping_path = 'clean_movies/clean_movies.item'
-
-        self.cl_weight = config.get('proto_reg_weight', 0.1)
-        self.tau = config.get('temperature', 0.5)
 
 
         try:
@@ -75,6 +116,10 @@ class AdaptiveLightGCN(LightGCN):
         self.item_alpha_weights = 1.0 / torch.log(torch.e + item_counts)
 
     def calculate_loss(self, interaction):
+        # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!
+        if self.restore_user_e is not None or self.restore_item_e is not None:
+            self.restore_user_e, self.restore_item_e = None, None
+
         user = interaction[self.USER_ID]
         pos_item = interaction[self.ITEM_ID]
         neg_item = interaction[self.NEG_ITEM_ID]
@@ -125,9 +170,6 @@ class AdaptiveLightGCN(LightGCN):
         weighted_proto_loss_mean = (batch_alphas * proto_loss_vector).mean()
         
         sem_loss_value = self.cl_weight * weighted_proto_loss_mean
-        
-        # 2. РАДАР ГРАДИЕНТОВ: Печатаем лоссы случайным образом (~1% батчей)
-        if torch.rand(1).item() < 0.01:
-            print(f"⚖️ Баланс: BPR={loss_bpr.item():.4f} | SemLoss={sem_loss_value.item():.4f}")
 
-        return loss_bpr + sem_loss_value
+        # Возвращаем tuple, чтобы Trainer мог получить доступ к отдельным компонентам лосса
+        return loss_bpr + sem_loss_value, loss_bpr, sem_loss_value

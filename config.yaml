@@ -8,7 +8,7 @@ load_col:
 
 # Гиперпараметры кастомной модели (Адаптивной)
 temperature: 0.5
-proto_reg_weight: 0.05
+proto_reg_weight: 0.5
 centroids_path: 'cluster_centroids.pt'
 
 # Настройки обучения

@@ -1,1 +1,12 @@
 /.kaggle
+__pycache__/
+.vscode/
+data/
+saved/
+log_tensorboard/
+clean_movies/
+*.pt
+*.pth
+*.csv
+*.zip
+run_tensorboard.bat

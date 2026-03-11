@@ -2,7 +2,7 @@ import torch
 from recbole.config import Config
 from recbole.data import create_dataset, data_preparation
 from recbole.trainer import Trainer
-from adaptive_lightgcn import AdaptiveLightGCN, VerboseDataLoader
+from adaptive_lightgcn import AdaptiveLightGCN, CustomTrainer
 import glob, os
 import numpy as np
 import pandas as pd
@@ -136,9 +136,12 @@ train_dynamic, valid_dynamic, test_dynamic = data_preparation(config_dynamic, da
 
 # Инициализация и обучение
 model_dynamic = DynamicLeakyLogAdaptiveLightGCN(config_dynamic, train_dynamic.dataset).to(config_dynamic['device'])
-trainer_dynamic = Trainer(config_dynamic, model_dynamic)
 
-trainer_dynamic.fit(VerboseDataLoader(train_dynamic, interval=50), valid_dynamic, show_progress=False)
+# Используем наш CustomTrainer вместо обычной обертки
+trainer_dynamic = CustomTrainer(config_dynamic, model_dynamic)
+
+# show_progress=False отключает стандартный tqdm, но наш _train_epoch будет печатать логи
+trainer_dynamic.fit(train_dynamic, valid_dynamic, show_progress=False)
 
 # Оценка
 test_result_dynamic = trainer_dynamic.evaluate(test_dynamic, show_progress=False)
