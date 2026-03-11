@@ -65,12 +65,7 @@ if os.path.exists('movies_metadata.csv') and os.path.exists('ratings.csv'):
     print(f"   Рейтингов: {len(df_ratings_final)}")
     print(df_movies_final[['movie_id', 'title', 'description']].head(3))
 else:
-    raise FileNotFoundError("❌ Ошибка: Файлы данных (movies_metadata.csv или ratings.csv) не найдены. Пожалуйста, перезапустите эту ячейку!")
-
-
-# Проверка наличия данных перед запуском
-if 'df_movies_final' not in globals():
-    raise NameError("⚠️ Переменная 'df_movies_final' не найдена. Пожалуйста, вернитесь к предыдущей ячейке и дождитесь её ПОЛНОГО выполнения (скачивания данных).")
+    raise FileNotFoundError("❌ Ошибка: Файлы данных (movies_metadata.csv или ratings.csv) не найдены. Пожалуйста, проверьте наличие файлов!")
 
 print("🧠 Векторизация текстов (Sentence-BERT)...")
 model = SentenceTransformer('all-MiniLM-L6-v2')

@@ -86,15 +86,10 @@ def clean_cache():
 
 _original_torch_load = torch.load
 
-# Защита от двойного применения патча при перезапуске ячейки в Colab
-if not hasattr(torch, '_original_load_saved'):
-    torch._original_load_saved = torch.load
+def patched_torch_load(*args, **kwargs):
+    kwargs['weights_only'] = False
+    return _original_torch_load(*args, **kwargs)
 
-    def patched_torch_load(*args, **kwargs):
-        kwargs['weights_only'] = False
-        return torch._original_load_saved(*args, **kwargs)
-
-    torch.load = patched_torch_load
 # Подменяем оригинальную функцию нашей оберткой
 torch.load = patched_torch_load
 
