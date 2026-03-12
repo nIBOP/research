@@ -157,7 +157,7 @@ class AdaptiveLightGCN(LightGCN):
         if self.centroid_proj:
             all_centroids_matrix = self.centroid_proj(all_centroids_matrix)
 
-        current_item_embs = F.normalize(pos_embeddings, dim=1)
+        current_item_embs = F.normalize(pos_embeddings.detach(), dim=1)
         all_centroids_matrix = F.normalize(all_centroids_matrix, dim=1)
 
         cos_sim = torch.matmul(current_item_embs, all_centroids_matrix.t())
