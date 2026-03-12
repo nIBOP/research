@@ -12,6 +12,7 @@ proto_reg_weight: 0.05
 centroids_path: 'cluster_centroids.pt'
 
 # Настройки обучения
+seed: 42
 epochs: 300               
 train_batch_size: 2048
 learner: adam

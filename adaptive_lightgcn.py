@@ -4,7 +4,6 @@ import torch.nn.functional as F
 import pandas as pd
 from recbole.model.general_recommender.lightgcn import LightGCN
 from recbole.trainer import Trainer
-from recbole.utils import set_color, get_gpu_usage
 from torch.nn.utils import clip_grad_norm_
 
 class CustomTrainer(Trainer):

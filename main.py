@@ -1,14 +1,47 @@
 import torch
+import random
 from recbole.config import Config
 from recbole.data import create_dataset, data_preparation
 from recbole.trainer import Trainer
 from adaptive_lightgcn import AdaptiveLightGCN, CustomTrainer
-import glob, os
+import glob, os, sys, datetime
 import numpy as np
 import pandas as pd
 from recbole.utils.case_study import full_sort_topk
 
-def evaluate_stratified(trainer, test_data, train_data, k=10, sample_size=1000):
+class OutputLogger:
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.log_file = open(filename, "w", encoding="utf-8")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log_file.write(message)
+        self.log_file.flush()
+
+    def flush(self):
+        self.terminal.flush()
+        self.log_file.flush()
+
+# Создаем уникальный файл лога для каждого запуска
+os.makedirs("train_logs", exist_ok=True)
+log_filename = os.path.join("train_logs", datetime.datetime.now().strftime("experiment_log_%Y-%m-%d_%H-%M-%S.txt"))
+sys.stdout = OutputLogger(log_filename)
+sys.stderr = sys.stdout  # Перенаправляем и ошибки в этот же файл
+
+def seed_everything(seed=42):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+seed_everything(42)
+
+def evaluate_stratified(trainer, test_data, train_data, k=10):
     print("\n" + "="*50)
     print("📊 СТРАТИФИЦИРОВАННЫЙ АНАЛИЗ (HEAD / TORSO / TAIL)")
 

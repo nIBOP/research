@@ -3,6 +3,7 @@ __pycache__/
 .vscode/
 data/
 saved/
+.archive/
 log_tensorboard/
 clean_movies/
 *.pt
