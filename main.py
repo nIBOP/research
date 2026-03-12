@@ -2,7 +2,6 @@ import torch
 import random
 from recbole.config import Config
 from recbole.data import create_dataset, data_preparation
-from recbole.trainer import Trainer
 from adaptive_lightgcn import AdaptiveLightGCN, CustomTrainer
 import glob, os, sys, datetime
 import numpy as np
@@ -126,36 +125,6 @@ def patched_torch_load(*args, **kwargs):
 # Подменяем оригинальную функцию нашей оберткой
 torch.load = patched_torch_load
 
-class DynamicLeakyLogAdaptiveLightGCN(AdaptiveLightGCN):
-    def __init__(self, config, dataset):
-        super().__init__(config, dataset)
-
-        train_item_ids = dataset.inter_feat[dataset.iid_field]
-        item_counts = torch.bincount(train_item_ids, minlength=self.n_items).float().to(self.device)
-
-        # --- 1. ДИНАМИЧЕСКИЙ ПОРОГ (85-й перцентиль) ---
-        active_items = item_counts[item_counts > 0]
-        dynamic_cutoff = torch.quantile(active_items, 0.85).item()
-
-        # --- 2. LEAKY FLOOR (Минимальный вес) ---
-        min_weight = 0.05 # Хиты сохранят 5% семантического веса (чтобы сохранить "мост")
-
-        log_counts = torch.log(item_counts + 1)
-        log_cutoff = torch.log(torch.tensor(dynamic_cutoff + 1).to(self.device))
-
-        new_alphas = 1.0 - (log_counts / log_cutoff)
-
-        # Обрезаем снизу не нулем, а min_weight!
-        self.item_alpha_weights = torch.clamp(new_alphas, min=min_weight, max=1.0)
-
-        tail_count = (item_counts <= 5).sum().item()
-        head_count = (item_counts >= dynamic_cutoff).sum().item()
-
-        print(f"\n[DynamicLeakyLog] 🌉 Применено Динамическое Дырявое Затухание!")
-        print(f"   - Динамический порог (85%): {dynamic_cutoff:.1f} оценок")
-        print(f"   - Min Weight (Floor): {min_weight} (сохраняем мост для {head_count} хитов)")
-        print(f"   - Tail (<=5 оценок): {tail_count} фильмов (вес тяготеет к 1.0)")
-
 # Очистка кэша
 clean_cache()
 
@@ -168,7 +137,7 @@ dataset_dynamic = create_dataset(config_dynamic)
 train_dynamic, valid_dynamic, test_dynamic = data_preparation(config_dynamic, dataset_dynamic)
 
 # Инициализация и обучение
-model_dynamic = DynamicLeakyLogAdaptiveLightGCN(config_dynamic, train_dynamic.dataset).to(config_dynamic['device'])
+model_dynamic = AdaptiveLightGCN(config_dynamic, train_dynamic.dataset).to(config_dynamic['device'])
 
 # Используем наш CustomTrainer вместо обычной обертки
 trainer_dynamic = CustomTrainer(config_dynamic, model_dynamic)

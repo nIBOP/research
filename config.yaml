@@ -10,6 +10,14 @@ load_col:
 temperature: 0.5
 proto_reg_weight: 0.05
 centroids_path: 'cluster_centroids.pt'
+item_mapping_path: 'clean_movies/clean_movies.item'
+ema_momentum: 0.99
+hit_quantile: 0.80
+semantic_sampling: 'uniform'        # 'uniform' | 'batch'
+alpha_strategy: 'dynamic_leaky_log' # 'dynamic_leaky_log' | 'inverse_log'
+alpha_min: 0.05
+alpha_max: 0.5
+dynamic_cutoff_quantile: 0.85
 
 # Настройки обучения
 seed: 42

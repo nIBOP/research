@@ -6,6 +6,14 @@ from recbole.model.general_recommender.lightgcn import LightGCN
 from recbole.trainer import Trainer
 from torch.nn.utils import clip_grad_norm_
 
+
+def _cfg(config, key, default):
+    """Safely fetch optional config value with a default fallback."""
+    try:
+        return config[key]
+    except KeyError:
+        return default
+
 class CustomTrainer(Trainer):
     def _train_epoch(self, train_data, epoch_idx, loss_func=None, show_progress=False):
         """Переопределяем метод для вывода логов батчей вместо progress bar"""
@@ -69,7 +77,14 @@ class AdaptiveLightGCN(LightGCN):
         self.centroids_path = config['centroids_path']
         self.cl_weight = config['proto_reg_weight']
         self.tau = config['temperature']
-        self.item_mapping_path = 'clean_movies/clean_movies.item'
+        self.item_mapping_path = _cfg(config, 'item_mapping_path', 'clean_movies/clean_movies.item')
+        self.ema_momentum = _cfg(config, 'ema_momentum', 0.99)
+        self.hit_quantile = _cfg(config, 'hit_quantile', 0.80)
+        self.semantic_sampling = _cfg(config, 'semantic_sampling', 'uniform')
+        self.alpha_strategy = _cfg(config, 'alpha_strategy', 'dynamic_leaky_log')
+        self.alpha_max = _cfg(config, 'alpha_max', 0.5)
+        self.alpha_min = _cfg(config, 'alpha_min', 0.05)
+        self.dynamic_cutoff_quantile = _cfg(config, 'dynamic_cutoff_quantile', 0.85)
 
 
         try:
@@ -83,7 +98,7 @@ class AdaptiveLightGCN(LightGCN):
                     nn.LayerNorm(self.latent_dim * 2),
                     nn.LeakyReLU(0.2),
                     nn.Linear(self.latent_dim * 2, self.latent_dim)
-                )
+                ).to(self.device)
             else:
                 self.centroid_proj = None
             print(f"[AdaptiveLightGCN] ✅ Loaded {self.n_clusters} semantic centroids.")
@@ -110,9 +125,36 @@ class AdaptiveLightGCN(LightGCN):
             except Exception as e:
                 print(f"[AdaptiveLightGCN] ⚠️ Mapping failed: {e}")
 
+            # --- Инициализация EMA буфера маяков (Dynamic Centroids) ---
+            with torch.no_grad():
+                if self.centroid_proj is not None:
+                    init_dyn = self.centroid_proj(self.semantic_centroids)
+                else:
+                    init_dyn = self.semantic_centroids.clone()
+            self.register_buffer('dynamic_centroids', init_dyn.clone())
+            self.register_buffer('static_centroids', init_dyn.clone())  # Резервный статический вектор
+
         train_item_ids = dataset.inter_feat[dataset.iid_field]
         item_counts = torch.bincount(train_item_ids, minlength=self.n_items).float().to(self.device)
-        self.item_alpha_weights = 1.0 / torch.log(torch.e + item_counts)
+        self.item_counts = item_counts
+        
+        # Порог для "хитов". Фильмы с количеством оценок выше этого будут формировать центроид.
+        active_items = item_counts[item_counts > 0]
+        self.hit_threshold = torch.quantile(active_items, self.hit_quantile).item() if len(active_items) > 0 else 0
+
+        # Все параметры расчета alpha-коэффициентов управляются через config.
+        if self.alpha_strategy == 'dynamic_leaky_log':
+            if len(active_items) > 0:
+                dynamic_cutoff = torch.quantile(active_items, self.dynamic_cutoff_quantile).item()
+                log_counts = torch.log(item_counts + 1)
+                log_cutoff = torch.log(torch.tensor(dynamic_cutoff + 1, device=self.device))
+                raw_alphas = 1.0 - (log_counts / log_cutoff)
+            else:
+                raw_alphas = torch.ones_like(item_counts)
+            self.item_alpha_weights = torch.clamp(raw_alphas, min=self.alpha_min, max=self.alpha_max)
+        else:
+            raw_alphas = 1.0 / torch.log(torch.e + item_counts)
+            self.item_alpha_weights = torch.clamp(raw_alphas, max=self.alpha_max)
 
     def calculate_loss(self, interaction):
         # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!
@@ -151,24 +193,46 @@ class AdaptiveLightGCN(LightGCN):
             return loss_bpr
 
         # --- Adaptive Contrastive Loss ---
+        # 1. Обновление маяков (EMA Update) идет по реальным взаимодействиям (pos_item) 
+        # Это позволяет центроидам следовать за популярными фильмами графа
         cluster_ids = self.item2cluster[pos_item]
-
-        all_centroids_matrix = self.semantic_centroids
-        if self.centroid_proj:
-            all_centroids_matrix = self.centroid_proj(all_centroids_matrix)
-
-        # Значение при forward = pos_embeddings, градиент при backward идет только в pos_ego_embeddings
-        sg_embeddings = pos_ego_embeddings + (pos_embeddings - pos_ego_embeddings).detach()
-        current_item_embs = F.normalize(sg_embeddings, dim=1)
         
-        all_centroids_matrix = F.normalize(all_centroids_matrix, dim=1)
+        if self.training:
+            with torch.no_grad():
+                unique_clusters = cluster_ids.unique()
+                for k in unique_clusters:
+                    # Фильтруем: берем только хиты текущего кластера для обновления маяка
+                    mask = (cluster_ids == k) & (self.item_counts[pos_item] >= self.hit_threshold)
+                    
+                    if mask.sum() > 0:
+                        c_k_tilde = torch.nanmean(pos_embeddings[mask], dim=0)
+                    else:
+                        c_k_tilde = self.static_centroids[k]
+                        
+                    self.dynamic_centroids[k] = self.ema_momentum * self.dynamic_centroids[k] + (1.0 - self.ema_momentum) * c_k_tilde
 
-        cos_sim = torch.matmul(current_item_embs, all_centroids_matrix.t())
+        # 2. Нормализация динамических центроидов
+        all_centroids_matrix = F.normalize(self.dynamic_centroids, dim=1)
+
+        # 3. Отвязка сэмплирования для семантического лосса управляется через config.
+        if self.semantic_sampling == 'uniform':
+            batch_size = pos_item.shape[0]
+            # n_items в RecBole включает отступ (padding) по индексу 0, поэтому сэмплируем от 1.
+            semantic_items = torch.randint(1, self.n_items, (batch_size,), device=self.device)
+        else:
+            semantic_items = pos_item
+
+        semantic_cluster_ids = self.item2cluster[semantic_items]
+        semantic_item_embs = F.normalize(item_all_embeddings[semantic_items], dim=1)
+
+        # Считаем лосс на равномерно сэмплированных фильмах
+        cos_sim = torch.matmul(semantic_item_embs, all_centroids_matrix.t())
         logits = cos_sim / self.tau
 
-        proto_loss_vector = F.cross_entropy(logits, cluster_ids, reduction='none')
+        proto_loss_vector = F.cross_entropy(logits, semantic_cluster_ids, reduction='none')
 
-        batch_alphas = self.item_alpha_weights[pos_item]
+        # Альфа-коррекция также применяется к равномерным фильмам
+        batch_alphas = self.item_alpha_weights[semantic_items]
         weighted_proto_loss_mean = (batch_alphas * proto_loss_vector).mean()
         
         sem_loss_value = self.cl_weight * weighted_proto_loss_mean

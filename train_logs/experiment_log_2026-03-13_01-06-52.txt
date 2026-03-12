@@ -1,0 +1,96 @@
+
+🚀 Запуск Эксперимента 4: Dynamic Leaky Log Decay...
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:2136: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\utils\tensor_numpy.cpp:209.)
+  new_data[k] = torch.LongTensor(value)
+C:\research\.venv\Lib\site-packages\recbole\model\general_recommender\lightgcn.py:124: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\utils\tensor_new.cpp:656.)
+  SparseL = torch.sparse.FloatTensor(i, data, torch.Size(L.shape))
+[AdaptiveLightGCN] ✅ Loaded 150 semantic centroids.
+[AdaptiveLightGCN] 🔗 Успешно смапплено 5002 фильмов с кластерами.
+   [Epoch 0] batch 50/172 | Loss: 0.7040 (BPR: 0.6213, Sem: 0.0828)
+   [Epoch 0] batch 100/172 | Loss: 0.4723 (BPR: 0.3893, Sem: 0.0829)
+   [Epoch 0] batch 150/172 | Loss: 0.3517 (BPR: 0.2660, Sem: 0.0857)
+🏁 [Epoch 0] Завершена! Суммарный лосс: 94.8878 (BPR: 80.2001, Sem: 14.6878)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1365), ('recall@50', 0.3114), ('ndcg@10', 0.1019), ('ndcg@50', 0.1494)])
+   [Epoch 1] batch 50/172 | Loss: 0.3211 (BPR: 0.2305, Sem: 0.0905)
+   [Epoch 1] batch 100/172 | Loss: 0.3153 (BPR: 0.2240, Sem: 0.0913)
+   [Epoch 1] batch 150/172 | Loss: 0.3070 (BPR: 0.2161, Sem: 0.0908)
+🏁 [Epoch 1] Завершена! Суммарный лосс: 53.2094 (BPR: 37.6583, Sem: 15.5510)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1366), ('recall@50', 0.3111), ('ndcg@10', 0.1019), ('ndcg@50', 0.1494)])
+   [Epoch 2] batch 50/172 | Loss: 0.3117 (BPR: 0.2187, Sem: 0.0930)
+   [Epoch 2] batch 100/172 | Loss: 0.3183 (BPR: 0.2269, Sem: 0.0914)
+   [Epoch 2] batch 150/172 | Loss: 0.2875 (BPR: 0.1964, Sem: 0.0911)
+🏁 [Epoch 2] Завершена! Суммарный лосс: 51.3336 (BPR: 35.5403, Sem: 15.7933)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1363), ('recall@50', 0.3112), ('ndcg@10', 0.1018), ('ndcg@50', 0.1492)])
+   [Epoch 3] batch 50/172 | Loss: 0.2977 (BPR: 0.2077, Sem: 0.0901)
+   [Epoch 3] batch 100/172 | Loss: 0.3003 (BPR: 0.2076, Sem: 0.0927)
+   [Epoch 3] batch 150/172 | Loss: 0.2785 (BPR: 0.1852, Sem: 0.0933)
+🏁 [Epoch 3] Завершена! Суммарный лосс: 50.5388 (BPR: 34.6714, Sem: 15.8674)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1361), ('recall@50', 0.3116), ('ndcg@10', 0.1019), ('ndcg@50', 0.1494)])
+   [Epoch 4] batch 50/172 | Loss: 0.2858 (BPR: 0.1936, Sem: 0.0922)
+   [Epoch 4] batch 100/172 | Loss: 0.3048 (BPR: 0.2131, Sem: 0.0917)
+   [Epoch 4] batch 150/172 | Loss: 0.2931 (BPR: 0.2018, Sem: 0.0913)
+🏁 [Epoch 4] Завершена! Суммарный лосс: 50.0111 (BPR: 34.1727, Sem: 15.8385)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1361), ('recall@50', 0.3111), ('ndcg@10', 0.1019), ('ndcg@50', 0.1494)])
+   [Epoch 5] batch 50/172 | Loss: 0.2878 (BPR: 0.1966, Sem: 0.0913)
+   [Epoch 5] batch 100/172 | Loss: 0.2775 (BPR: 0.1856, Sem: 0.0919)
+   [Epoch 5] batch 150/172 | Loss: 0.2838 (BPR: 0.1919, Sem: 0.0919)
+🏁 [Epoch 5] Завершена! Суммарный лосс: 49.6117 (BPR: 33.7764, Sem: 15.8353)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1367), ('recall@50', 0.3124), ('ndcg@10', 0.1023), ('ndcg@50', 0.1497)])
+   [Epoch 6] batch 50/172 | Loss: 0.2945 (BPR: 0.2015, Sem: 0.0930)
+   [Epoch 6] batch 100/172 | Loss: 0.2925 (BPR: 0.2001, Sem: 0.0924)
+   [Epoch 6] batch 150/172 | Loss: 0.2919 (BPR: 0.1995, Sem: 0.0924)
+🏁 [Epoch 6] Завершена! Суммарный лосс: 49.1672 (BPR: 33.3176, Sem: 15.8496)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1375), ('recall@50', 0.3112), ('ndcg@10', 0.1026), ('ndcg@50', 0.1495)])
+   [Epoch 7] batch 50/172 | Loss: 0.2963 (BPR: 0.2041, Sem: 0.0922)
+   [Epoch 7] batch 100/172 | Loss: 0.2665 (BPR: 0.1745, Sem: 0.0920)
+   [Epoch 7] batch 150/172 | Loss: 0.2823 (BPR: 0.1894, Sem: 0.0929)
+🏁 [Epoch 7] Завершена! Суммарный лосс: 48.5849 (BPR: 32.7517, Sem: 15.8332)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1379), ('recall@50', 0.3118), ('ndcg@10', 0.1029), ('ndcg@50', 0.1498)])
+   [Epoch 8] batch 50/172 | Loss: 0.2735 (BPR: 0.1798, Sem: 0.0937)
+   [Epoch 8] batch 100/172 | Loss: 0.2846 (BPR: 0.1927, Sem: 0.0919)
+   [Epoch 8] batch 150/172 | Loss: 0.2610 (BPR: 0.1682, Sem: 0.0928)
+🏁 [Epoch 8] Завершена! Суммарный лосс: 47.9754 (BPR: 32.1413, Sem: 15.8341)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1379), ('recall@50', 0.3148), ('ndcg@10', 0.1031), ('ndcg@50', 0.1506)])
+   [Epoch 9] batch 50/172 | Loss: 0.2635 (BPR: 0.1722, Sem: 0.0914)
+   [Epoch 9] batch 100/172 | Loss: 0.3025 (BPR: 0.2112, Sem: 0.0913)
+   [Epoch 9] batch 150/172 | Loss: 0.2735 (BPR: 0.1817, Sem: 0.0918)
+🏁 [Epoch 9] Завершена! Суммарный лосс: 47.6464 (BPR: 31.7739, Sem: 15.8725)
+Traceback (most recent call last):
+  File "C:\research\main.py", line 146, in <module>
+    trainer_dynamic.fit(train_dynamic, valid_dynamic, show_progress=False)
+  File "C:\research\.venv\Lib\site-packages\recbole\trainer\trainer.py", line 464, in fit
+    valid_score, valid_result = self._valid_epoch(
+                                ^^^^^^^^^^^^^^^^^^
+  File "C:\research\adaptive_lightgcn.py", line 70, in _valid_epoch
+    valid_score, valid_result = super()._valid_epoch(valid_data, show_progress=False)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\research\.venv\Lib\site-packages\recbole\trainer\trainer.py", line 283, in _valid_epoch
+    valid_result = self.evaluate(
+                   ^^^^^^^^^^^^^^
+  File "C:\research\.venv\Lib\site-packages\torch\utils\_contextlib.py", line 116, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\research\.venv\Lib\site-packages\recbole\trainer\trainer.py", line 616, in evaluate
+    interaction, scores, positive_u, positive_i = eval_func(batched_data)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\research\.venv\Lib\site-packages\recbole\trainer\trainer.py", line 525, in _full_sort_batch_eval
+    scores = self.model.full_sort_predict(interaction.to(self.device))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\research\.venv\Lib\site-packages\recbole\model\general_recommender\lightgcn.py", line 207, in full_sort_predict
+    scores = torch.matmul(u_embeddings, self.restore_item_e.transpose(0, 1))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
