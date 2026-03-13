@@ -193,16 +193,10 @@ class AdaptiveLightGCN(LightGCN):
         pos_embeddings = item_all_embeddings[pos_item]
         neg_embeddings = item_all_embeddings[neg_item]
 
-        # --- ИЗМЕНЕНИЕ ДЛЯ СОВПАДЕНИЯ С INFERENCE (Борьба с Norm Bias) ---
-        # Нормализуем векторы
-        u_emb_norm = F.normalize(u_embeddings, p=2, dim=1)
-        pos_emb_norm = F.normalize(pos_embeddings, p=2, dim=1)
-        neg_emb_norm = F.normalize(neg_embeddings, p=2, dim=1)
-
-        # Вычисляем косинусное сходство и масштабируем (Temperature Scaling)
-        scale = 15.0
-        pos_scores = torch.mul(u_emb_norm, pos_emb_norm).sum(dim=1) * scale
-        neg_scores = torch.mul(u_emb_norm, neg_emb_norm).sum(dim=1) * scale
+        # --- ОТКАТ К КЛАССИЧЕСКОМУ LIGHTGCN ---
+        # Классическое скалярное произведение (Dot Product)
+        pos_scores = torch.mul(u_embeddings, pos_embeddings).sum(dim=1)
+        neg_scores = torch.mul(u_embeddings, neg_embeddings).sum(dim=1)
         
         mf_loss = self.mf_loss(pos_scores, neg_scores)
 
@@ -313,10 +307,8 @@ class AdaptiveLightGCN(LightGCN):
         u_embeddings = self.restore_user_e[user]
         i_embeddings = self.restore_item_e[item]
 
-        # L2-нормализация: убиваем влияние огромных векторов популярных фильмов!
-        u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
-        i_embeddings = F.normalize(i_embeddings, p=2, dim=1)
-
+        # Классическое скалярное произведение (Dot Product)
+        # Возвращаем длину векторов, чтобы популярные фильмы (Head) вытянули общий Recall
         scores = torch.mul(u_embeddings, i_embeddings).sum(dim=1)
         return scores
 
@@ -331,9 +323,6 @@ class AdaptiveLightGCN(LightGCN):
         u_embeddings = self.restore_user_e[user]
         item_all_embeddings = self.restore_item_e
 
-        # L2-нормализация для всей базы перед генерацией Топ-10
-        u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
-        item_all_embeddings = F.normalize(item_all_embeddings, p=2, dim=1)
-
+        # Классическое матричное умножение без нормализации
         scores = torch.matmul(u_embeddings, item_all_embeddings.transpose(0, 1))
         return scores.view(-1)
