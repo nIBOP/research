@@ -19,9 +19,13 @@ class CustomTrainer(Trainer):
         """Переопределяем метод для вывода логов батчей вместо progress bar"""
         self.model.train()
         loss_func = loss_func or self.model.calculate_loss
-        total_loss = None
         
-        batch_interval = 50  # Интервал печати логов
+        # Накапливаем лоссы как тензоры на GPU!
+        total_loss_tensor = torch.tensor(0.0, device=self.model.device)
+        total_bpr_tensor = torch.tensor(0.0, device=self.model.device)
+        total_sem_tensor = torch.tensor(0.0, device=self.model.device)
+        
+        batch_interval = 50 
         total_batches = len(train_data)
         
         for batch_idx, interaction in enumerate(train_data):
@@ -36,16 +40,14 @@ class CustomTrainer(Trainer):
             # Обработка кортежа потерь
             if isinstance(losses, tuple):
                 loss = losses[0]  # Суммарный лосс для backward
-                loss_bpr = losses[1].item()
-                loss_sem = losses[2].item()
-                
-                loss_tuple = tuple(per_loss.item() for per_loss in losses)
-                total_loss = loss_tuple if total_loss is None else tuple(map(sum, zip(total_loss, loss_tuple)))
+                # Плюсуем тензоры напрямую на видеокарте (избегая In-place ошибок broadcast)
+                total_loss_tensor = total_loss_tensor + losses[0].detach().squeeze()
+                total_bpr_tensor = total_bpr_tensor + losses[1].detach().squeeze()
+                total_sem_tensor = total_sem_tensor + losses[2].detach().squeeze()
             else:
                 loss = losses
-                loss_bpr = loss.item()
-                loss_sem = 0.0
-                total_loss = losses.item() if total_loss is None else total_loss + losses.item()
+                total_loss_tensor = total_loss_tensor + losses.detach().squeeze()
+                total_bpr_tensor = total_bpr_tensor + losses.detach().squeeze()
                 
             self._check_nan(loss)
             loss.backward()
@@ -54,16 +56,24 @@ class CustomTrainer(Trainer):
                 clip_grad_norm_(self.model.parameters(), **self.clip_grad_norm)
             self.optimizer.step()
                 
-            # --- НАШИ ЛОГИ: выводим без засорения памяти ---
+            # Синхронизация CPU-GPU происходит ТОЛЬКО раз в 50 батчей
             if batch_idx > 0 and batch_idx % batch_interval == 0:
-                print(f"   [Epoch {epoch_idx}] batch {batch_idx}/{total_batches} | Loss: {loss.item():.4f} (BPR: {loss_bpr:.4f}, Sem: {loss_sem:.4f})")
+                if isinstance(losses, tuple):
+                    print(f"   [Epoch {epoch_idx}] batch {batch_idx}/{total_batches} | Loss: {losses[0].item():.4f} (BPR: {losses[1].item():.4f}, Sem: {losses[2].item():.4f})")
+                else:
+                    print(f"   [Epoch {epoch_idx}] batch {batch_idx}/{total_batches} | Loss: {loss.item():.4f}")
         
-        # Красивый вывод с учетом того, что total_loss может быть кортежем
-        if isinstance(total_loss, tuple):
-            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {total_loss[0]:.4f} (BPR: {total_loss[1]:.4f}, Sem: {total_loss[2]:.4f})")
+        # Финальная синхронизация в конце эпохи
+        final_loss = total_loss_tensor.item()
+        final_bpr = total_bpr_tensor.item()
+        final_sem = total_sem_tensor.item()
+        
+        if isinstance(losses, tuple):
+            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {final_loss:.4f} (BPR: {final_bpr:.4f}, Sem: {final_sem:.4f})")
+            return (final_loss, final_bpr, final_sem)
         else:
-            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {total_loss:.4f}")
-        return total_loss
+            print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {final_loss:.4f}")
+            return final_loss
 
     def _valid_epoch(self, valid_data, show_progress=False):
         """Переопределяем _valid_epoch, чтобы выводить результаты валидации"""
@@ -178,8 +188,17 @@ class AdaptiveLightGCN(LightGCN):
         pos_embeddings = item_all_embeddings[pos_item]
         neg_embeddings = item_all_embeddings[neg_item]
 
-        pos_scores = torch.mul(u_embeddings, pos_embeddings).sum(dim=1)
-        neg_scores = torch.mul(u_embeddings, neg_embeddings).sum(dim=1)
+        # --- ИЗМЕНЕНИЕ ДЛЯ СОВПАДЕНИЯ С INFERENCE (Борьба с Norm Bias) ---
+        # Нормализуем векторы
+        u_emb_norm = F.normalize(u_embeddings, p=2, dim=1)
+        pos_emb_norm = F.normalize(pos_embeddings, p=2, dim=1)
+        neg_emb_norm = F.normalize(neg_embeddings, p=2, dim=1)
+
+        # Вычисляем косинусное сходство и масштабируем (Temperature Scaling)
+        scale = 15.0
+        pos_scores = torch.mul(u_emb_norm, pos_emb_norm).sum(dim=1) * scale
+        neg_scores = torch.mul(u_emb_norm, neg_emb_norm).sum(dim=1) * scale
+        
         mf_loss = self.mf_loss(pos_scores, neg_scores)
 
         # Сырые веса (0-й слой)
@@ -206,15 +225,34 @@ class AdaptiveLightGCN(LightGCN):
         
         if self.training:
             with torch.no_grad():
-                unique_clusters = cluster_ids.unique()
-                for k in unique_clusters:
-                    # Фильтруем: берем только хиты текущего кластера для обновления маяка
-                    mask = (cluster_ids == k) & (self.item_counts[pos_item] >= self.hit_threshold)
+                # Находим только "хиты" в текущем батче
+                hit_mask = self.item_counts[pos_item] >= self.hit_threshold
+                valid_clusters = cluster_ids[hit_mask]
+                valid_embeddings = pos_embeddings[hit_mask]
+
+                if valid_clusters.numel() > 0:
+                    # Векторизованное вычисление средних по кластерам без циклов!
+                    # Создаем one-hot матрицу принадлежности к кластерам (Размер: N_hits x K)
+                    cluster_one_hot = F.one_hot(valid_clusters, num_classes=self.n_clusters).float()
                     
-                    if mask.sum() > 0:
-                        c_k_tilde = torch.nanmean(pos_embeddings[mask], dim=0)
-                        # Обновляем EMA-буфер центроидов только если есть хиты в текущем батче!
-                        self.dynamic_centroids[k] = self.ema_momentum * self.dynamic_centroids[k] + (1.0 - self.ema_momentum) * c_k_tilde
+                    # Считаем сумму векторов для каждого кластера: (K x N_hits) @ (N_hits x D) -> (K x D)
+                    sum_embeddings = torch.matmul(cluster_one_hot.t(), valid_embeddings)
+                    
+                    # Считаем количество хитов в каждом кластере: (K,)
+                    counts = cluster_one_hot.sum(dim=0)
+                    
+                    # Находим кластеры, в которых есть хотя бы 1 хит в текущем батче
+                    active_mask = counts > 0
+                    
+                    if active_mask.any():
+                        # Вычисляем среднее только для активных кластеров (деление на ноль исключено маской)
+                        c_k_tilde = sum_embeddings[active_mask] / counts[active_mask].unsqueeze(1)
+                        
+                        # Массово обновляем динамические центроиды (EMA) одной операцией
+                        self.dynamic_centroids[active_mask] = (
+                            self.ema_momentum * self.dynamic_centroids[active_mask] + 
+                            (1.0 - self.ema_momentum) * c_k_tilde
+                        )
                         
         # 2. Нормализация динамических центроидов
         all_centroids_matrix = F.normalize(self.dynamic_centroids, dim=1)
@@ -253,3 +291,32 @@ class AdaptiveLightGCN(LightGCN):
 
         # Возвращаем tuple, чтобы Trainer мог получить доступ к отдельным компонентам лосса
         return loss_bpr + sem_loss_value, loss_bpr, sem_loss_value
+
+    def predict(self, interaction):
+        user = interaction[self.USER_ID]
+        item = interaction[self.ITEM_ID]
+
+        user_all_embeddings, item_all_embeddings = self.forward()
+
+        u_embeddings = user_all_embeddings[user]
+        i_embeddings = item_all_embeddings[item]
+
+        # L2-нормализация: убиваем влияние огромных векторов популярных фильмов!
+        u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
+        i_embeddings = F.normalize(i_embeddings, p=2, dim=1)
+
+        scores = torch.mul(u_embeddings, i_embeddings).sum(dim=1)
+        return scores
+
+    def full_sort_predict(self, interaction):
+        user = interaction[self.USER_ID]
+        
+        user_all_embeddings, item_all_embeddings = self.forward()
+        u_embeddings = user_all_embeddings[user]
+
+        # L2-нормализация для всей базы перед генерацией Топ-10
+        u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
+        item_all_embeddings = F.normalize(item_all_embeddings, p=2, dim=1)
+
+        scores = torch.matmul(u_embeddings, item_all_embeddings.transpose(0, 1))
+        return scores.view(-1)
