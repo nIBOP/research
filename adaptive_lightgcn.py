@@ -82,8 +82,10 @@ class AdaptiveLightGCN(LightGCN):
         self.hit_quantile = _cfg(config, 'hit_quantile', 0.80)
         self.semantic_sampling = _cfg(config, 'semantic_sampling', 'uniform')
         self.alpha_strategy = _cfg(config, 'alpha_strategy', 'dynamic_leaky_log')
-        self.alpha_max = _cfg(config, 'alpha_max', 0.5)
-        self.alpha_min = _cfg(config, 'alpha_min', 0.05)
+        # New clearer names, with backward compatibility for old alpha_* keys.
+        self.semantic_weight_cap = _cfg(config, 'semantic_weight_cap', _cfg(config, 'alpha_max', 0.5))
+        self.semantic_weight_floor = _cfg(config, 'semantic_weight_floor', _cfg(config, 'alpha_min', 0.05))
+        self.semantic_margin = _cfg(config, 'semantic_margin', 0.8)
         self.dynamic_cutoff_quantile = _cfg(config, 'dynamic_cutoff_quantile', 0.85)
 
 
@@ -126,14 +128,15 @@ class AdaptiveLightGCN(LightGCN):
                 print(f"[AdaptiveLightGCN] ⚠️ Mapping failed: {e}")
 
             # --- Инициализация EMA буфера маяков (Dynamic Centroids) ---
+            # Инициализируем маяки (EMA буфер) случайным шумом линейного слоя. 
+            # Но теперь они будут обновляться только тогда, когда в батче есть популярные фильмы
             with torch.no_grad():
                 if self.centroid_proj is not None:
                     init_dyn = self.centroid_proj(self.semantic_centroids)
                 else:
                     init_dyn = self.semantic_centroids.clone()
             self.register_buffer('dynamic_centroids', init_dyn.clone())
-            self.register_buffer('static_centroids', init_dyn.clone())  # Резервный статический вектор
-
+            
         train_item_ids = dataset.inter_feat[dataset.iid_field]
         item_counts = torch.bincount(train_item_ids, minlength=self.n_items).float().to(self.device)
         self.item_counts = item_counts
@@ -151,10 +154,14 @@ class AdaptiveLightGCN(LightGCN):
                 raw_alphas = 1.0 - (log_counts / log_cutoff)
             else:
                 raw_alphas = torch.ones_like(item_counts)
-            self.item_alpha_weights = torch.clamp(raw_alphas, min=self.alpha_min, max=self.alpha_max)
+            self.item_alpha_weights = torch.clamp(
+                raw_alphas,
+                min=self.semantic_weight_floor,
+                max=self.semantic_weight_cap
+            )
         else:
             raw_alphas = 1.0 / torch.log(torch.e + item_counts)
-            self.item_alpha_weights = torch.clamp(raw_alphas, max=self.alpha_max)
+            self.item_alpha_weights = torch.clamp(raw_alphas, max=self.semantic_weight_cap)
 
     def calculate_loss(self, interaction):
         # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!
@@ -206,11 +213,9 @@ class AdaptiveLightGCN(LightGCN):
                     
                     if mask.sum() > 0:
                         c_k_tilde = torch.nanmean(pos_embeddings[mask], dim=0)
-                    else:
-                        c_k_tilde = self.static_centroids[k]
+                        # Обновляем EMA-буфер центроидов только если есть хиты в текущем батче!
+                        self.dynamic_centroids[k] = self.ema_momentum * self.dynamic_centroids[k] + (1.0 - self.ema_momentum) * c_k_tilde
                         
-                    self.dynamic_centroids[k] = self.ema_momentum * self.dynamic_centroids[k] + (1.0 - self.ema_momentum) * c_k_tilde
-
         # 2. Нормализация динамических центроидов
         all_centroids_matrix = F.normalize(self.dynamic_centroids, dim=1)
 
@@ -227,13 +232,22 @@ class AdaptiveLightGCN(LightGCN):
 
         # Считаем лосс на равномерно сэмплированных фильмах
         cos_sim = torch.matmul(semantic_item_embs, all_centroids_matrix.t())
-        logits = cos_sim / self.tau
+        
+        # Получаем косинусное сходство элементов с их целевыми центроидами (маяками)
+        batch_indices = torch.arange(batch_size, device=self.device)
+        pos_sims = cos_sim[batch_indices, semantic_cluster_ids]
+        
+        # Создаем маску "зоны терпимости" (Dead-Zone Margin)
+        # Если фильм уже достаточно близко к центру кластера (cos_sim > margin), отключаем для него семантический лосс, 
+        # чтобы предотвратить коллапс ("идеальное среднее") и сохранить уникальность вектора.
+        margin_mask = (pos_sims < self.semantic_margin).float()
 
+        logits = cos_sim / self.tau
         proto_loss_vector = F.cross_entropy(logits, semantic_cluster_ids, reduction='none')
 
-        # Альфа-коррекция также применяется к равномерным фильмам
+        # Per-item semantic weight + Margin Mask
         batch_alphas = self.item_alpha_weights[semantic_items]
-        weighted_proto_loss_mean = (batch_alphas * proto_loss_vector).mean()
+        weighted_proto_loss_mean = (batch_alphas * proto_loss_vector * margin_mask).mean()
         
         sem_loss_value = self.cl_weight * weighted_proto_loss_mean
 

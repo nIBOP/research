@@ -7,7 +7,7 @@ load_col:
     inter: [user_id, item_id, rating]
 
 # Гиперпараметры кастомной модели (Адаптивной)
-temperature: 0.5
+temperature: 0.2
 proto_reg_weight: 0.05
 centroids_path: 'cluster_centroids.pt'
 item_mapping_path: 'clean_movies/clean_movies.item'
@@ -15,8 +15,10 @@ ema_momentum: 0.99
 hit_quantile: 0.80
 semantic_sampling: 'uniform'        # 'uniform' | 'batch'
 alpha_strategy: 'dynamic_leaky_log' # 'dynamic_leaky_log' | 'inverse_log'
-alpha_min: 0.05
-alpha_max: 0.5
+semantic_weight_floor: 0.05          # нижняя граница веса семантического лосса per item
+semantic_weight_cap: 0.1             # верхняя граница веса семантического лосса per item
+semantic_margin: 0.8                 # зона терпимости (косинусное сходство), после которой притяжение отключается
+# Deprecated aliases (still supported in code): alpha_min, alpha_max
 dynamic_cutoff_quantile: 0.85
 
 # Настройки обучения
