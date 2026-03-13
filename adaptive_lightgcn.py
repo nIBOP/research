@@ -305,10 +305,13 @@ class AdaptiveLightGCN(LightGCN):
         user = interaction[self.USER_ID]
         item = interaction[self.ITEM_ID]
 
-        user_all_embeddings, item_all_embeddings = self.forward()
+        # ИСПОЛЬЗУЕМ КЭШ: Считаем весь граф только 1 раз за эпоху валидации!
+        if self.restore_user_e is None or self.restore_item_e is None:
+            self.restore_user_e, self.restore_item_e = self.forward()
 
-        u_embeddings = user_all_embeddings[user]
-        i_embeddings = item_all_embeddings[item]
+        # Берем готовые векторы из кэша
+        u_embeddings = self.restore_user_e[user]
+        i_embeddings = self.restore_item_e[item]
 
         # L2-нормализация: убиваем влияние огромных векторов популярных фильмов!
         u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
@@ -320,8 +323,13 @@ class AdaptiveLightGCN(LightGCN):
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID]
         
-        user_all_embeddings, item_all_embeddings = self.forward()
-        u_embeddings = user_all_embeddings[user]
+        # ИСПОЛЬЗУЕМ КЭШ: Считаем весь граф только 1 раз за эпоху валидации!
+        if self.restore_user_e is None or self.restore_item_e is None:
+            self.restore_user_e, self.restore_item_e = self.forward()
+
+        # Берем готовые векторы из кэша
+        u_embeddings = self.restore_user_e[user]
+        item_all_embeddings = self.restore_item_e
 
         # L2-нормализация для всей базы перед генерацией Топ-10
         u_embeddings = F.normalize(u_embeddings, p=2, dim=1)
