@@ -75,6 +75,11 @@ class CustomTrainer(Trainer):
             print(f"🏁 [Epoch {epoch_idx}] Завершена! Суммарный лосс: {final_loss:.4f}")
             return final_loss
 
+    def _check_nan(self, loss):
+        # Переопределяем метод RecBole, чтобы отключить if torch.isnan(loss):
+        # Который заставляет CPU ждать GPU на каждом батче!
+        pass
+
     def _valid_epoch(self, valid_data, show_progress=False):
         """Переопределяем _valid_epoch, чтобы выводить результаты валидации"""
         valid_score, valid_result = super()._valid_epoch(valid_data, show_progress=False)
@@ -225,34 +230,38 @@ class AdaptiveLightGCN(LightGCN):
         
         if self.training:
             with torch.no_grad():
-                # Находим только "хиты" в текущем батче
-                hit_mask = self.item_counts[pos_item] >= self.hit_threshold
-                valid_clusters = cluster_ids[hit_mask]
-                valid_embeddings = pos_embeddings[hit_mask]
-
-                if valid_clusters.numel() > 0:
-                    # Векторизованное вычисление средних по кластерам без циклов!
-                    # Создаем one-hot матрицу принадлежности к кластерам (Размер: N_hits x K)
-                    cluster_one_hot = F.one_hot(valid_clusters, num_classes=self.n_clusters).float()
-                    
-                    # Считаем сумму векторов для каждого кластера: (K x N_hits) @ (N_hits x D) -> (K x D)
-                    sum_embeddings = torch.matmul(cluster_one_hot.t(), valid_embeddings)
-                    
-                    # Считаем количество хитов в каждом кластере: (K,)
-                    counts = cluster_one_hot.sum(dim=0)
-                    
-                    # Находим кластеры, в которых есть хотя бы 1 хит в текущем батче
-                    active_mask = counts > 0
-                    
-                    if active_mask.any():
-                        # Вычисляем среднее только для активных кластеров (деление на ноль исключено маской)
-                        c_k_tilde = sum_embeddings[active_mask] / counts[active_mask].unsqueeze(1)
-                        
-                        # Массово обновляем динамические центроиды (EMA) одной операцией
-                        self.dynamic_centroids[active_mask] = (
-                            self.ema_momentum * self.dynamic_centroids[active_mask] + 
-                            (1.0 - self.ema_momentum) * c_k_tilde
-                        )
+                # 1. Находим "хиты" и кастуем в float (Размер: Батч x 1)
+                hit_mask_float = (self.item_counts[pos_item] >= self.hit_threshold).float().unsqueeze(1)
+                
+                # 2. Обнуляем эмбеддинги не-хитов (Размер: Батч x D)
+                # Нет изменения размера тензора! Нет блокировки процессора!
+                valid_embeddings = pos_embeddings * hit_mask_float
+                
+                # 3. Создаем One-Hot матрицу для всех элементов батча (Размер: Батч x K)
+                cluster_one_hot = F.one_hot(cluster_ids, num_classes=self.n_clusters).float()
+                
+                # 4. Обнуляем One-Hot для не-хитов (Размер: Батч x K)
+                cluster_one_hot_hits = cluster_one_hot * hit_mask_float
+                
+                # 5. Считаем сумму векторов для каждого кластера (Размер: K x D)
+                sum_embeddings = torch.matmul(cluster_one_hot_hits.t(), valid_embeddings)
+                
+                # 6. Считаем количество хитов в каждом кластере (Размер: K x 1)
+                counts = cluster_one_hot_hits.sum(dim=0).unsqueeze(1)
+                
+                # 7. Защита от деления на ноль (добавляем крошечный epsilon)
+                c_k_tilde = sum_embeddings / (counts + 1e-9)
+                
+                # 8. Создаем маску обновления (1.0 для активных кластеров, 0.0 для пустых)
+                update_mask = (counts > 0).float()
+                
+                # 9. Применяем EMA только там, где update_mask == 1.0 (Fallback для остальных)
+                # Все операции выполняются одновременно для всей матрицы.
+                # Используем .copy_(), чтобы гарантированно не отвязать registered_buffer.
+                self.dynamic_centroids.copy_((
+                    self.ema_momentum * self.dynamic_centroids + 
+                    (1.0 - self.ema_momentum) * c_k_tilde
+                ) * update_mask + self.dynamic_centroids * (1.0 - update_mask))
                         
         # 2. Нормализация динамических центроидов
         all_centroids_matrix = F.normalize(self.dynamic_centroids, dim=1)
