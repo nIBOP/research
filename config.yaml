@@ -7,7 +7,8 @@ load_col:
     inter: [user_id, item_id, rating]
 
 # Гиперпараметры кастомной модели (Адаптивной)
-temperature: 0.2
+tau_min: 0.2
+tau_max: 0.8
 proto_reg_weight: 0.05
 centroids_path: 'cluster_centroids.pt'
 item_mapping_path: 'clean_movies/clean_movies.item'

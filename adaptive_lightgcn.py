@@ -178,6 +178,25 @@ class AdaptiveLightGCN(LightGCN):
             raw_alphas = 1.0 / torch.log(torch.e + item_counts)
             self.item_alpha_weights = torch.clamp(raw_alphas, max=self.semantic_weight_cap)
 
+        # --- Degree-Aware Temperature ---
+        self.tau_min = _cfg(config, 'tau_min', 0.2)
+        self.tau_max = _cfg(config, 'tau_max', 0.8)
+        
+        if len(active_items) > 0:
+            log_counts = torch.log(item_counts + 1)
+            max_log = torch.max(log_counts)
+            if max_log > 0:
+                # Популярные (близко к max_log) получают tau_min, редкие (близко к 0) получают tau_max
+                self.item_tau = self.tau_max - (self.tau_max - self.tau_min) * (log_counts / max_log)
+            else:
+                self.item_tau = torch.full_like(item_counts, self.tau_max)
+        else:
+            self.item_tau = torch.full_like(item_counts, self.tau_max)
+
+        # Обучаемые параметры для Гомоскедастичной неопределенности (Homoscedastic Uncertainty)
+        # Инициализируем нулями. exp(0) = 1.0, так что на старте веса лоссов будут равны 1.0
+        self.log_vars = nn.Parameter(torch.zeros(2))
+
     def calculate_loss(self, interaction):
         # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!
         if self.restore_user_e is not None or self.restore_item_e is not None:
@@ -283,46 +302,76 @@ class AdaptiveLightGCN(LightGCN):
         # чтобы предотвратить коллапс ("идеальное среднее") и сохранить уникальность вектора.
         margin_mask = (pos_sims < self.semantic_margin).float()
 
-        logits = cos_sim / self.tau
+        # Применяем матрицу индивидуальных температур для батча
+        batch_tau = self.item_tau[semantic_items].unsqueeze(1)
+        logits = cos_sim / batch_tau
+        
         proto_loss_vector = F.cross_entropy(logits, semantic_cluster_ids, reduction='none')
 
         # Per-item semantic weight + Margin Mask
         batch_alphas = self.item_alpha_weights[semantic_items]
         weighted_proto_loss_mean = (batch_alphas * proto_loss_vector * margin_mask).mean()
         
-        sem_loss_value = self.cl_weight * weighted_proto_loss_mean
+        # Снимаем жесткое умножение на cl_weight
+        sem_loss_raw = weighted_proto_loss_mean
 
-        # Возвращаем tuple, чтобы Trainer мог получить доступ к отдельным компонентам лосса
-        return loss_bpr + sem_loss_value, loss_bpr, sem_loss_value
+        # --- МАГИЯ HOMOSCEDASTIC UNCERTAINTY ---
+        # precision = exp(-log_var), это безопасный способ вычислять 1 / sigma^2
+        precision_bpr = torch.exp(-self.log_vars[0])
+        loss_bpr_dynamic = precision_bpr * loss_bpr + self.log_vars[0]
+        
+        precision_sem = torch.exp(-self.log_vars[1])
+        sem_loss_dynamic = precision_sem * sem_loss_raw + self.log_vars[1]
+        
+        total_dynamic_loss = loss_bpr_dynamic + sem_loss_dynamic
+
+        # Случайный логгер (~1 раз за эпоху, если в эпохе около 200 батчей)
+        if self.training and torch.rand(1).item() < 0.005:
+            print(f"\n⚖️ АВТО-БАЛАНС: Вес BPR = {precision_bpr.item():.4f} | Вес Sem = {precision_sem.item():.4f}")
+            print(f"   Сырые лоссы: BPR = {loss_bpr.item():.4f} | Sem = {sem_loss_raw.item():.4f}")
+
+        # Возвращаем динамический тотал-лосс для backward(), 
+        # но сырые лоссы оставляем в кортеже, чтобы трейнер выводил настоящие значения
+        return total_dynamic_loss, loss_bpr, sem_loss_raw
 
     def predict(self, interaction):
         user = interaction[self.USER_ID]
         item = interaction[self.ITEM_ID]
 
-        # ИСПОЛЬЗУЕМ КЭШ: Считаем весь граф только 1 раз за эпоху валидации!
         if self.restore_user_e is None or self.restore_item_e is None:
             self.restore_user_e, self.restore_item_e = self.forward()
 
-        # Берем готовые векторы из кэша
         u_embeddings = self.restore_user_e[user]
         i_embeddings = self.restore_item_e[item]
 
-        # Классическое скалярное произведение (Dot Product)
-        # Возвращаем длину векторов, чтобы популярные фильмы (Head) вытянули общий Recall
-        scores = torch.mul(u_embeddings, i_embeddings).sum(dim=1)
+        # --- Дробная калибровка магнитуды (Fractional Magnitude Calibration) ---
+        gamma = 0.25 # Гиперпараметр силы подавления популярности (0.0 = Dot Product, 1.0 = Cosine)
+        
+        # Считаем L2-норму (длину) каждого вектора фильма
+        i_norms = torch.norm(i_embeddings, p=2, dim=1)
+        # Возводим норму в дробную степень
+        i_norms_gamma = torch.pow(i_norms, gamma)
+        # Слегка "сдуваем" огромные векторы хитов
+        i_embeddings_calibrated = i_embeddings / (i_norms_gamma.unsqueeze(1) + 1e-9)
+
+        scores = torch.mul(u_embeddings, i_embeddings_calibrated).sum(dim=1)
         return scores
 
     def full_sort_predict(self, interaction):
         user = interaction[self.USER_ID]
         
-        # ИСПОЛЬЗУЕМ КЭШ: Считаем весь граф только 1 раз за эпоху валидации!
         if self.restore_user_e is None or self.restore_item_e is None:
             self.restore_user_e, self.restore_item_e = self.forward()
 
-        # Берем готовые векторы из кэша
         u_embeddings = self.restore_user_e[user]
-        item_all_embeddings = self.restore_item_e
+        item_all_embeddings = self.restore_item_e.clone()
 
-        # Классическое матричное умножение без нормализации
-        scores = torch.matmul(u_embeddings, item_all_embeddings.transpose(0, 1))
+        # --- Дробная калибровка магнитуды (Fractional Magnitude Calibration) ---
+        gamma = 0.25 
+        
+        i_norms = torch.norm(item_all_embeddings, p=2, dim=1)
+        i_norms_gamma = torch.pow(i_norms, gamma)
+        item_all_embeddings_calibrated = item_all_embeddings / (i_norms_gamma.unsqueeze(1) + 1e-9)
+
+        scores = torch.matmul(u_embeddings, item_all_embeddings_calibrated.transpose(0, 1))
         return scores.view(-1)
