@@ -54,3 +54,7 @@ NDCG@10: 0.1931
 --- Dynamic Leaky Log Ablation ---
 Recall@10: 0.2463
 NDCG@10: 0.1935
+
+--- Dynamic Leaky Log Ablation ---
+Recall@10: 0.2494
+NDCG@10: 0.1959
