@@ -98,6 +98,11 @@ os.makedirs('clean_movies', exist_ok=True)
 centroids_tensor = torch.tensor(kmeans.cluster_centers_, dtype=torch.float32)
 torch.save(centroids_tensor, 'cluster_centroids.pt')
 
+# 1.5 Сохраняем сырые семантические эмбеддинги для каждого фильма
+# Используем movie_id как ключ (строка) для надежного маппинга
+item_embs_dict = {str(item_id): emb for item_id, emb in zip(df_movies_final['movie_id'], embeddings)}
+torch.save(item_embs_dict, 'clean_movies/semantic_embeddings.pt')
+
 # 2. Создаем файл свойств (.item) для RecBole
 df_item = pd.DataFrame({
     'item_id:token': df_movies_final['movie_id'],

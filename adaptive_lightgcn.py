@@ -102,6 +102,11 @@ class AdaptiveLightGCN(LightGCN):
         self.semantic_weight_floor = _cfg(config, 'semantic_weight_floor', _cfg(config, 'alpha_min', 0.05))
         self.semantic_margin = _cfg(config, 'semantic_margin', 0.8)
         self.dynamic_cutoff_quantile = _cfg(config, 'dynamic_cutoff_quantile', 0.85)
+        
+        # --- Гейтирование ---
+        self.semantic_embs_path = _cfg(config, 'semantic_embs_path', 'clean_movies/semantic_embeddings.pt')
+        self.use_semantic_gating = _cfg(config, 'use_semantic_gating', True)
+        self.gating_w_max = _cfg(config, 'gating_w_max', 0.8)
 
 
         try:
@@ -152,6 +157,39 @@ class AdaptiveLightGCN(LightGCN):
                     init_dyn = self.semantic_centroids.clone()
             self.register_buffer('dynamic_centroids', init_dyn.clone())
             
+        # --- Загрузка сырых семантических эмбеддингов для гейтирования ---
+        self.raw_semantic_embs = None
+        if self.use_semantic_gating:
+            try:
+                raw_embs_dict = torch.load(self.semantic_embs_path)
+                example_emb = next(iter(raw_embs_dict.values()))
+                raw_dim = len(example_emb)
+                
+                # Создаем буфер нулей
+                temp_embs = torch.zeros(self.n_items, raw_dim, device=self.device)
+                token2id = dataset.field2token_id[dataset.iid_field]
+                mapped_count = 0
+                
+                for token, iid in token2id.items():
+                    if token != '[PAD]' and str(token) in raw_embs_dict:
+                        # Convert to tensor if it isn't already
+                        emb_tensor = torch.tensor(raw_embs_dict[str(token)], device=self.device)
+                        temp_embs[iid] = emb_tensor
+                        mapped_count += 1
+                print(f"[AdaptiveLightGCN] 🔗 Успешно смапплено {mapped_count} фильмов с сырыми семантическими векторами.")
+                
+                self.register_buffer('raw_semantic_embs', temp_embs)
+                
+                # Проекционный линейный слой для сырой семантики
+                self.semantic_gating_proj = nn.Sequential(
+                    nn.Linear(raw_dim, self.latent_dim),
+                    nn.LayerNorm(self.latent_dim),
+                    nn.LeakyReLU(0.2)
+                ).to(self.device)
+            except Exception as e:
+                print(f"[AdaptiveLightGCN] ⚠️ Failed to load raw semantic embeddings: {e}")
+                self.use_semantic_gating = False
+
         train_item_ids = dataset.inter_feat[dataset.iid_field]
         item_counts = torch.bincount(train_item_ids, minlength=self.n_items).float().to(self.device)
         self.item_counts = item_counts
@@ -193,9 +231,38 @@ class AdaptiveLightGCN(LightGCN):
         else:
             self.item_tau = torch.full_like(item_counts, self.tau_max)
 
+        # --- Degree-aware Gating Weights (Экспоненциальное затухание) ---
+        if self.use_semantic_gating and len(active_items) > 0:
+            # tau для гейта подбираем так, чтобы медианные фильмы имели вес gate_w_max / e
+            gating_tau = torch.median(active_items.float()).item()
+            # Для нулевых взаимодействий вес будет gating_w_max, для популярных близко к 0
+            self.gating_weights = self.gating_w_max * torch.exp(-item_counts / (gating_tau + 1e-5))
+            # Shape: (n_items, 1) для удобного броадкастинга
+            self.gating_weights = self.gating_weights.unsqueeze(1)
+        else:
+            self.gating_weights = torch.zeros(self.n_items, 1, device=self.device)
+
         # Обучаемые параметры для Гомоскедастичной неопределенности (Homoscedastic Uncertainty)
         # Инициализируем нулями. exp(0) = 1.0, так что на старте веса лоссов будут равны 1.0
         self.log_vars = nn.Parameter(torch.zeros(2))
+
+    def forward(self):
+        # 1. Получаем классические CF эмбеддинги из графа
+        user_all_embeddings, item_all_embeddings_cf = super().forward()
+
+        # 2. Если включено гейтирование, подмешиваем семантику
+        if self.use_semantic_gating and self.raw_semantic_embs is not None:
+            # Получаем проецированную семантику для всех фильмов: (n_items, latent_dim)
+            item_sem_embeddings = self.semantic_gating_proj(self.raw_semantic_embs)
+            
+            # Смешиваем: (1 - w) * E_cf + w * E_sem
+            item_all_embeddings_final = (1 - self.gating_weights) * item_all_embeddings_cf + self.gating_weights * item_sem_embeddings
+            
+            # Возвращаем смешанные эмбеддинги. 
+            # Для лосса и метрик будут использоваться именно они, что решает проблему холодного старта "из коробки"
+            return user_all_embeddings, item_all_embeddings_final
+        
+        return user_all_embeddings, item_all_embeddings_cf
 
     def calculate_loss(self, interaction):
         # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!
