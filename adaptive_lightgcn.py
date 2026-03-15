@@ -88,7 +88,11 @@ class CustomTrainer(Trainer):
 
 class AdaptiveLightGCN(LightGCN):
     def __init__(self, config, dataset):
+        self.temp_dataset = dataset  # Сохраняем временно для get_norm_adj_mat
         super(AdaptiveLightGCN, self).__init__(config, dataset)
+        if hasattr(self, 'temp_dataset'):
+            del self.temp_dataset
+            
         self.centroids_path = config['centroids_path']
         self.cl_weight = config['proto_reg_weight']
         self.tau = config['temperature']
@@ -196,6 +200,146 @@ class AdaptiveLightGCN(LightGCN):
         # Обучаемые параметры для Гомоскедастичной неопределенности (Homoscedastic Uncertainty)
         # Инициализируем нулями. exp(0) = 1.0, так что на старте веса лоссов будут равны 1.0
         self.log_vars = nn.Parameter(torch.zeros(2))
+        
+        # --- Параметры для семантической аугментации (Graph Rewiring) ---
+        # Встроено по умолчанию. Читаем параметры из конфига или используем значения по умолчанию
+        self.rewire_k = _cfg(config, 'rewire_k', 2)
+        self.rewire_weight = _cfg(config, 'rewire_weight', 0.5)
+        self.semantic_embeddings_path = _cfg(config, 'semantic_embeddings_path', 'clean_movies/semantic_embeddings.pt')
+
+    def get_norm_adj_mat(self):
+        """Переопределяем метод для инъекции семантических ребер Head-Tail."""
+        import scipy.sparse as sp
+        import numpy as np
+        
+        # Получаем базовую матрицу взаимодействий (U-I)
+        inter_M = self.interaction_matrix
+        inter_M_t = self.interaction_matrix.transpose()
+        
+        # Инициализируем пустую матрицу смежности (U+I)x(U+I)
+        A = sp.dok_matrix((self.n_users + self.n_items, self.n_users + self.n_items), dtype=np.float32)
+
+        # 1. Заполняем реальные связи User-Item
+        data_dict = dict(zip(zip(inter_M.row, inter_M.col + self.n_users), [1] * inter_M.nnz))
+        data_dict.update(dict(zip(zip(inter_M_t.row + self.n_users, inter_M_t.col), [1] * inter_M_t.nnz)))
+        A._update(data_dict)
+
+        # Читаем параметры из атрибутов класса, если они есть, иначе используем дефолтные значения
+        rewire_k = getattr(self, 'rewire_k', 2)
+        rewire_weight = getattr(self, 'rewire_weight', 0.5)
+        semantic_embeddings_path = getattr(self, 'semantic_embeddings_path', 'clean_movies/semantic_embeddings.pt')
+
+        # 2. ДОБАВИТЬ СЕМАНТИЧЕСКИЕ РЕБРА (встроено по умолчанию)
+        try:
+            # Пытаемся загрузить семантические векторы (Sentence-BERT и т.д.)
+            sem_embs = torch.load(semantic_embeddings_path)
+            
+            print(f"[Graph Rewiring] Строим семантические фантомные ребра. Находим близких Head-соседей для Tail-фильмов...")
+            
+            # Внутри инициализации LightGCN мы не можем полагаться на self.dataset
+            # Но у нас есть self.interaction_matrix! Посчитаем частоты (degree) прямо из нее.
+            # inter_M.col содержит ID фильмов (0-indexed по внутренним RecBole).
+            item_counts_np = np.bincount(inter_M.col, minlength=self.n_items)
+            
+            # Фильмы без взаимодействий (чистый холодный старт) не учитываются в квантилях
+            active_items = item_counts_np[item_counts_np > 0]
+            hit_quantile = getattr(self, 'hit_quantile', 0.80)
+            head_threshold = np.quantile(active_items, hit_quantile) if len(active_items) > 0 else 0
+            
+            # Маски: кто Head, кто Tail (0 индекс не учитываем)
+            # При этом, если фильм не имеет взаимодействий, но он есть в item_counts_np, его count=0, он будет Tail (или Cold Start)
+            # Включим в Tail все, у кого < head_threshold 
+            head_mask = (item_counts_np >= head_threshold)
+            # Важно: 0-й индекс (pad_item) исключаем из Tail принудительно:
+            tail_mask = (item_counts_np < head_threshold)
+            head_mask[0] = False
+            tail_mask[0] = False
+            
+            head_indices = np.where(head_mask)[0]
+            tail_indices = np.where(tail_mask)[0]
+            
+            if len(head_indices) > 0 and len(tail_indices) > 0:
+                # Если sem_embs - это словарь (например, после сохранения через torch.save), достаем сам тензор
+                if isinstance(sem_embs, dict) and 'embeddings' in sem_embs:
+                    sem_embs = sem_embs['embeddings']
+                elif isinstance(sem_embs, dict):
+                    keys = list(sem_embs.keys())
+                    sem_embs = sem_embs[keys[0]]
+                    
+                # -------------------------------------------------------------
+                # ФИКС АЛАЙНМЕНТА: Сопоставляем внешние ID с внутренними ID RecBole!
+                # -------------------------------------------------------------
+                dataset = getattr(self, 'temp_dataset', None)
+                if dataset is None:
+                    raise Exception("temp_dataset not found, cannot align semantic embeddings!")
+                
+                # Читаем clean_movies.item, чтобы понять, в каком порядке лежат эмбеддинги
+                item_mapping_path = getattr(self, 'item_mapping_path', 'clean_movies/clean_movies.item')
+                df_map = pd.read_csv(item_mapping_path, sep='\t', dtype=str)
+                external_ids = df_map['item_id:token'].values
+                
+                token2id = dataset.field2token_id[dataset.iid_field]
+                
+                aligned_embs = torch.zeros((self.n_items, sem_embs.shape[1]), device=self.device)
+                
+                for i, ext_id in enumerate(external_ids):
+                    if ext_id in token2id:
+                        int_id = token2id[ext_id]
+                        aligned_embs[int_id] = sem_embs[i].to(self.device)
+                # -------------------------------------------------------------
+                
+                head_embs = aligned_embs[head_indices]
+                tail_embs = aligned_embs[tail_indices]
+                
+                # Нормализуем для косинусного сходства
+                head_embs_norm = F.normalize(head_embs, p=2, dim=1)
+                tail_embs_norm = F.normalize(tail_embs, p=2, dim=1)
+                
+                # Считаем матрицу попарного сходства (|Tail| x |Head|)
+                sim_matrix = torch.matmul(tail_embs_norm, head_embs_norm.t())
+                
+                # Находим K ближайших Head-соседей для каждого Tail-элемента
+                top_k_sims, top_k_head_idx_in_head_array = torch.topk(sim_matrix, min(rewire_k, len(head_indices)), dim=1)
+                
+                added_edges = 0
+                rewire_edges_dict = {}
+                
+                for tail_i, top_heads in enumerate(top_k_head_idx_in_head_array.cpu().numpy()):
+                    real_tail_id = tail_indices[tail_i]
+                    for head_i_in_array in top_heads:
+                        real_head_id = head_indices[head_i_in_array]
+                        
+                        idx1 = real_tail_id + self.n_users
+                        idx2 = real_head_id + self.n_users
+                        
+                        rewire_edges_dict[(idx1, idx2)] = rewire_weight
+                        rewire_edges_dict[(idx2, idx1)] = rewire_weight
+                        added_edges += 2
+                
+                A._update(rewire_edges_dict)
+                print(f"[Graph Rewiring] ✅ Успешно добавлено {added_edges} фантомных ребер (Item-Item) с весом {rewire_weight}.")
+            else:
+                print("[Graph Rewiring] ⚠️ Недостаточно Head/Tail элементов для построения связей.")
+            
+            
+        except Exception as e:
+            print(f"[Graph Rewiring] ❌ Ошибка при добавлении связей (возможно проблема с эмбеддингами): {e}")
+
+        # 3. Нормализация (как в стандартном LightGCN, но с учетом весов)
+        # sumArr = (A > 0).sum(axis=1) # Плохо для взвешенных ребер, размывает сигнал!
+        sumArr = A.sum(axis=1)         # Считаем сумму весов
+        diag = np.array(sumArr.flatten())[0] + 1e-7
+        diag = np.power(diag, -0.5)
+        D = sp.diags(diag)
+        L = D * A * D
+        
+        # 4. Конвертация в тензор PyTorch
+        L = sp.coo_matrix(L)
+        row, col = L.row, L.col
+        i = torch.LongTensor(np.array([row, col]))
+        data = torch.FloatTensor(L.data)
+        SparseL = torch.sparse_coo_tensor(i, data, torch.Size(L.shape))
+        return SparseL
 
     def calculate_loss(self, interaction):
         # ВАЖНО: Очищаем кэш из LightGCN, иначе метрики будут стоять на месте!

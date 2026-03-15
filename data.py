@@ -98,6 +98,10 @@ os.makedirs('clean_movies', exist_ok=True)
 centroids_tensor = torch.tensor(kmeans.cluster_centers_, dtype=torch.float32)
 torch.save(centroids_tensor, 'cluster_centroids.pt')
 
+# 1.5 Сохраняем текстовые эмбеддинги (для Graph Rewiring)
+embeddings_tensor = torch.tensor(embeddings, dtype=torch.float32)
+torch.save(embeddings_tensor, 'clean_movies/semantic_embeddings.pt')
+
 # 2. Создаем файл свойств (.item) для RecBole
 df_item = pd.DataFrame({
     'item_id:token': df_movies_final['movie_id'],
