@@ -1,0 +1,1006 @@
+
+🚀 Запуск Эксперимента 4: Dynamic Leaky Log Decay...
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:648: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=0, inplace=True)
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:650: ChainedAssignmentError: A value is being set on a copy of a DataFrame or Series through chained assignment using an inplace method.
+Such inplace method never works to update the original DataFrame or Series, because the intermediate object on which we are setting values always behaves as a copy (due to Copy-on-Write).
+
+For example, when doing 'df[col].method(value, inplace=True)', try using 'df.method({col: value}, inplace=True)' instead, to perform the operation inplace on the original object, or try to avoid an inplace operation using 'df[col] = df[col].method(value)'.
+
+See the documentation for a more detailed explanation: https://pandas.pydata.org/pandas-docs/stable/user_guide/copy_on_write.html
+  feat[field].fillna(value=feat[field].mean(), inplace=True)
+C:\research\.venv\Lib\site-packages\recbole\data\dataset\dataset.py:2136: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\utils\tensor_numpy.cpp:209.)
+  new_data[k] = torch.LongTensor(value)
+[Graph Rewiring] Строим семантические фантомные ребра. Находим близких Head-соседей для Tail-фильмов...
+[Graph Rewiring] ✅ Добавлено 8096 Item-Item связей в лапласиан (однонаправленные, вес: 0.1).
+[AdaptiveLightGCN] ✅ Loaded 150 semantic centroids.
+[AdaptiveLightGCN] 🔗 Успешно смапплено 5002 фильмов с кластерами.
+   [Epoch 0] batch 50/172 | Loss: 1.0549 (BPR: 0.6913, Sem: 0.4072)
+   [Epoch 0] batch 100/172 | Loss: 0.9612 (BPR: 0.6449, Sem: 0.4053)
+   [Epoch 0] batch 150/172 | Loss: 0.6470 (BPR: 0.4155, Sem: 0.4022)
+🏁 [Epoch 0] Завершена! Суммарный лосс: 159.5797 (BPR: 103.8048, Sem: 70.6139)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1361), ('recall@50', 0.303), ('ndcg@10', 0.1015), ('ndcg@50', 0.1475)])
+   [Epoch 1] batch 50/172 | Loss: 0.1734 (BPR: 0.2621, Sem: 0.2583)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 1.3267 | Вес Sem = 1.2728
+   Сырые лоссы: BPR = 0.2621 | Sem = 0.2485
+   [Epoch 1] batch 100/172 | Loss: 0.0548 (BPR: 0.2407, Sem: 0.2542)
+   [Epoch 1] batch 150/172 | Loss: -0.0445 (BPR: 0.2287, Sem: 0.2516)
+🏁 [Epoch 1] Завершена! Суммарный лосс: 16.3950 (BPR: 42.4403, Sem: 44.7520)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1396), ('recall@50', 0.3138), ('ndcg@10', 0.103), ('ndcg@50', 0.1502)])
+   [Epoch 2] batch 50/172 | Loss: -0.1271 (BPR: 0.2265, Sem: 0.2671)
+   [Epoch 2] batch 100/172 | Loss: -0.1912 (BPR: 0.2335, Sem: 0.2594)
+   [Epoch 2] batch 150/172 | Loss: -0.3091 (BPR: 0.2001, Sem: 0.2605)
+🏁 [Epoch 2] Завершена! Суммарный лосс: -34.9029 (BPR: 36.7243, Sem: 44.8004)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1447), ('recall@50', 0.3211), ('ndcg@10', 0.106), ('ndcg@50', 0.1538)])
+   [Epoch 3] batch 50/172 | Loss: -0.3767 (BPR: 0.2104, Sem: 0.2576)
+   [Epoch 3] batch 100/172 | Loss: -0.4193 (BPR: 0.2093, Sem: 0.2642)
+   [Epoch 3] batch 150/172 | Loss: -0.5048 (BPR: 0.1875, Sem: 0.2694)
+🏁 [Epoch 3] Завершена! Суммарный лосс: -70.0307 (BPR: 35.1531, Sem: 45.9736)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1506), ('recall@50', 0.3317), ('ndcg@10', 0.109), ('ndcg@50', 0.1581)])
+   [Epoch 4] batch 50/172 | Loss: -0.5558 (BPR: 0.1938, Sem: 0.2702)
+   [Epoch 4] batch 100/172 | Loss: -0.5438 (BPR: 0.2122, Sem: 0.2743)
+   [Epoch 4] batch 150/172 | Loss: -0.6240 (BPR: 0.1974, Sem: 0.2714)
+🏁 [Epoch 4] Завершена! Суммарный лосс: -98.6881 (BPR: 33.9833, Sem: 46.5624)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1614), ('recall@50', 0.3459), ('ndcg@10', 0.1146), ('ndcg@50', 0.1648)])
+   [Epoch 5] batch 50/172 | Loss: -0.6807 (BPR: 0.1935, Sem: 0.2731)
+   [Epoch 5] batch 100/172 | Loss: -0.7341 (BPR: 0.1814, Sem: 0.2781)
+   [Epoch 5] batch 150/172 | Loss: -0.7596 (BPR: 0.1868, Sem: 0.2735)
+🏁 [Epoch 5] Завершена! Суммарный лосс: -120.2759 (BPR: 32.9655, Sem: 47.5441)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1688), ('recall@50', 0.358), ('ndcg@10', 0.1197), ('ndcg@50', 0.1714)])
+   [Epoch 6] batch 50/172 | Loss: -0.7602 (BPR: 0.1903, Sem: 0.2838)
+   [Epoch 6] batch 100/172 | Loss: -0.7828 (BPR: 0.1907, Sem: 0.2833)
+   [Epoch 6] batch 150/172 | Loss: -0.8096 (BPR: 0.1899, Sem: 0.2817)
+🏁 [Epoch 6] Завершена! Суммарный лосс: -136.7763 (BPR: 31.8173, Sem: 48.6099)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1743), ('recall@50', 0.369), ('ndcg@10', 0.1257), ('ndcg@50', 0.1791)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 3.4737 | Вес Sem = 2.7990
+   Сырые лоссы: BPR = 0.1697 | Sem = 0.2966
+   [Epoch 7] batch 50/172 | Loss: -0.8071 (BPR: 0.1933, Sem: 0.2872)
+   [Epoch 7] batch 100/172 | Loss: -0.9436 (BPR: 0.1608, Sem: 0.2862)
+   [Epoch 7] batch 150/172 | Loss: -0.9031 (BPR: 0.1727, Sem: 0.2905)
+🏁 [Epoch 7] Завершена! Суммарный лосс: -149.4494 (BPR: 30.6014, Sem: 49.6353)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1815), ('recall@50', 0.3764), ('ndcg@10', 0.1315), ('ndcg@50', 0.1849)])
+   [Epoch 8] batch 50/172 | Loss: -0.9265 (BPR: 0.1648, Sem: 0.2995)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 4.1058 | Вес Sem = 3.0543
+   Сырые лоссы: BPR = 0.1538 | Sem = 0.2932
+   [Epoch 8] batch 100/172 | Loss: -0.9255 (BPR: 0.1756, Sem: 0.2891)
+   [Epoch 8] batch 150/172 | Loss: -0.9998 (BPR: 0.1543, Sem: 0.2975)
+🏁 [Epoch 8] Завершена! Суммарный лосс: -158.9103 (BPR: 29.4047, Sem: 50.6983)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1841), ('recall@50', 0.3801), ('ndcg@10', 0.134), ('ndcg@50', 0.1877)])
+   [Epoch 9] batch 50/172 | Loss: -0.9941 (BPR: 0.1579, Sem: 0.2992)
+   [Epoch 9] batch 100/172 | Loss: -0.8302 (BPR: 0.1930, Sem: 0.3031)
+   [Epoch 9] batch 150/172 | Loss: -0.9801 (BPR: 0.1630, Sem: 0.3012)
+🏁 [Epoch 9] Завершена! Суммарный лосс: -163.6948 (BPR: 28.5347, Sem: 52.1162)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1839), ('recall@50', 0.3797), ('ndcg@10', 0.1352), ('ndcg@50', 0.1887)])
+   [Epoch 10] batch 50/172 | Loss: -0.8920 (BPR: 0.1702, Sem: 0.3205)
+   [Epoch 10] batch 100/172 | Loss: -0.9817 (BPR: 0.1601, Sem: 0.3097)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 5.0655 | Вес Sem = 3.2043
+   Сырые лоссы: BPR = 0.1803 | Sem = 0.3071
+   [Epoch 10] batch 150/172 | Loss: -1.0339 (BPR: 0.1514, Sem: 0.3087)
+🏁 [Epoch 10] Завершена! Суммарный лосс: -169.5081 (BPR: 27.4912, Sem: 53.0131)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1846), ('recall@50', 0.3798), ('ndcg@10', 0.1354), ('ndcg@50', 0.1891)])
+   [Epoch 11] batch 50/172 | Loss: -1.0476 (BPR: 0.1463, Sem: 0.3149)
+   [Epoch 11] batch 100/172 | Loss: -1.0333 (BPR: 0.1512, Sem: 0.3126)
+   [Epoch 11] batch 150/172 | Loss: -0.9398 (BPR: 0.1655, Sem: 0.3181)
+🏁 [Epoch 11] Завершена! Суммарный лосс: -171.9926 (BPR: 26.9169, Sem: 53.9504)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1852), ('recall@50', 0.3816), ('ndcg@10', 0.1365), ('ndcg@50', 0.1905)])
+   [Epoch 12] batch 50/172 | Loss: -1.0702 (BPR: 0.1460, Sem: 0.3127)
+   [Epoch 12] batch 100/172 | Loss: -0.9740 (BPR: 0.1558, Sem: 0.3260)
+   [Epoch 12] batch 150/172 | Loss: -1.1078 (BPR: 0.1394, Sem: 0.3149)
+🏁 [Epoch 12] Завершена! Суммарный лосс: -175.6003 (BPR: 25.9733, Sem: 55.0033)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.187), ('recall@50', 0.3849), ('ndcg@10', 0.138), ('ndcg@50', 0.1928)])
+   [Epoch 13] batch 50/172 | Loss: -1.0671 (BPR: 0.1387, Sem: 0.3306)
+   [Epoch 13] batch 100/172 | Loss: -1.0447 (BPR: 0.1447, Sem: 0.3269)
+   [Epoch 13] batch 150/172 | Loss: -1.0388 (BPR: 0.1411, Sem: 0.3365)
+🏁 [Epoch 13] Завершена! Суммарный лосс: -177.3434 (BPR: 25.2006, Sem: 56.3096)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1897), ('recall@50', 0.3891), ('ndcg@10', 0.1398), ('ndcg@50', 0.195)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 6.3482 | Вес Sem = 3.0915
+   Сырые лоссы: BPR = 0.1540 | Sem = 0.3256
+   [Epoch 14] batch 50/172 | Loss: -1.0642 (BPR: 0.1383, Sem: 0.3349)
+   [Epoch 14] batch 100/172 | Loss: -1.0432 (BPR: 0.1419, Sem: 0.3348)
+   [Epoch 14] batch 150/172 | Loss: -1.0499 (BPR: 0.1430, Sem: 0.3306)
+🏁 [Epoch 14] Завершена! Суммарный лосс: -178.2415 (BPR: 24.6678, Sem: 57.3807)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1926), ('recall@50', 0.3923), ('ndcg@10', 0.1428), ('ndcg@50', 0.1981)])
+   [Epoch 15] batch 50/172 | Loss: -1.0426 (BPR: 0.1448, Sem: 0.3292)
+   [Epoch 15] batch 100/172 | Loss: -0.9824 (BPR: 0.1485, Sem: 0.3412)
+   [Epoch 15] batch 150/172 | Loss: -1.0169 (BPR: 0.1398, Sem: 0.3494)
+🏁 [Epoch 15] Завершена! Суммарный лосс: -179.4656 (BPR: 24.0863, Sem: 58.4246)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1942), ('recall@50', 0.3948), ('ndcg@10', 0.1451), ('ndcg@50', 0.2007)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 6.8811 | Вес Sem = 2.9709
+   Сырые лоссы: BPR = 0.1368 | Sem = 0.3428
+   [Epoch 16] batch 50/172 | Loss: -1.0480 (BPR: 0.1356, Sem: 0.3491)
+   [Epoch 16] batch 100/172 | Loss: -1.0628 (BPR: 0.1354, Sem: 0.3448)
+   [Epoch 16] batch 150/172 | Loss: -0.9722 (BPR: 0.1462, Sem: 0.3499)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 7.0562 | Вес Sem = 2.9325
+   Сырые лоссы: BPR = 0.1166 | Sem = 0.3476
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 7.0626 | Вес Sem = 2.9310
+   Сырые лоссы: BPR = 0.1283 | Sem = 0.3411
+🏁 [Epoch 16] Завершена! Суммарный лосс: -182.2044 (BPR: 23.3582, Sem: 59.3228)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1953), ('recall@50', 0.3961), ('ndcg@10', 0.1467), ('ndcg@50', 0.2024)])
+   [Epoch 17] batch 50/172 | Loss: -1.1375 (BPR: 0.1229, Sem: 0.3502)
+   [Epoch 17] batch 100/172 | Loss: -1.0352 (BPR: 0.1361, Sem: 0.3530)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 7.2516 | Вес Sem = 2.8913
+   Сырые лоссы: BPR = 0.1347 | Sem = 0.3568
+   [Epoch 17] batch 150/172 | Loss: -0.9619 (BPR: 0.1446, Sem: 0.3571)
+🏁 [Epoch 17] Завершена! Суммарный лосс: -182.9417 (BPR: 22.8356, Sem: 60.4549)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.1976), ('recall@50', 0.3988), ('ndcg@10', 0.1488), ('ndcg@50', 0.2049)])
+   [Epoch 18] batch 50/172 | Loss: -1.0573 (BPR: 0.1289, Sem: 0.3641)
+   [Epoch 18] batch 100/172 | Loss: -1.1087 (BPR: 0.1239, Sem: 0.3591)
+   [Epoch 18] batch 150/172 | Loss: -1.0875 (BPR: 0.1295, Sem: 0.3521)
+🏁 [Epoch 18] Завершена! Суммарный лосс: -184.5707 (BPR: 22.2879, Sem: 61.3766)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.202), ('recall@50', 0.4007), ('ndcg@10', 0.1506), ('ndcg@50', 0.2062)])
+   [Epoch 19] batch 50/172 | Loss: -1.0568 (BPR: 0.1334, Sem: 0.3524)
+   [Epoch 19] batch 100/172 | Loss: -1.0936 (BPR: 0.1279, Sem: 0.3544)
+   [Epoch 19] batch 150/172 | Loss: -1.0043 (BPR: 0.1370, Sem: 0.3616)
+🏁 [Epoch 19] Завершена! Суммарный лосс: -183.1647 (BPR: 22.3052, Sem: 61.8739)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2019), ('recall@50', 0.4018), ('ndcg@10', 0.1514), ('ndcg@50', 0.2075)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 7.6471 | Вес Sem = 2.7893
+   Сырые лоссы: BPR = 0.1324 | Sem = 0.3595
+   [Epoch 20] batch 50/172 | Loss: -1.1323 (BPR: 0.1200, Sem: 0.3624)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 7.7820 | Вес Sem = 2.7722
+   Сырые лоссы: BPR = 0.1318 | Sem = 0.3583
+   [Epoch 20] batch 100/172 | Loss: -1.1146 (BPR: 0.1226, Sem: 0.3616)
+   [Epoch 20] batch 150/172 | Loss: -1.1852 (BPR: 0.1147, Sem: 0.3589)
+🏁 [Epoch 20] Завершена! Суммарный лосс: -188.9759 (BPR: 21.3821, Sem: 62.3706)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2057), ('recall@50', 0.4049), ('ndcg@10', 0.1533), ('ndcg@50', 0.2095)])
+   [Epoch 21] batch 50/172 | Loss: -1.1022 (BPR: 0.1258, Sem: 0.3572)
+   [Epoch 21] batch 100/172 | Loss: -1.2365 (BPR: 0.1069, Sem: 0.3631)
+   [Epoch 21] batch 150/172 | Loss: -1.1769 (BPR: 0.1134, Sem: 0.3660)
+🏁 [Epoch 21] Завершена! Суммарный лосс: -188.7969 (BPR: 21.2788, Sem: 62.7702)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2067), ('recall@50', 0.4071), ('ndcg@10', 0.1538), ('ndcg@50', 0.2103)])
+   [Epoch 22] batch 50/172 | Loss: -1.1625 (BPR: 0.1149, Sem: 0.3674)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 8.0933 | Вес Sem = 2.7306
+   Сырые лоссы: BPR = 0.1078 | Sem = 0.3660
+   [Epoch 22] batch 100/172 | Loss: -1.0827 (BPR: 0.1218, Sem: 0.3762)
+   [Epoch 22] batch 150/172 | Loss: -1.1064 (BPR: 0.1206, Sem: 0.3711)
+🏁 [Epoch 22] Завершена! Суммарный лосс: -190.1015 (BPR: 20.8823, Sem: 63.4765)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2077), ('recall@50', 0.4089), ('ndcg@10', 0.1544), ('ndcg@50', 0.2112)])
+   [Epoch 23] batch 50/172 | Loss: -1.1535 (BPR: 0.1122, Sem: 0.3795)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 8.2619 | Вес Sem = 2.7055
+   Сырые лоссы: BPR = 0.1208 | Sem = 0.3748
+   [Epoch 23] batch 100/172 | Loss: -1.1832 (BPR: 0.1116, Sem: 0.3703)
+   [Epoch 23] batch 150/172 | Loss: -1.1083 (BPR: 0.1175, Sem: 0.3801)
+🏁 [Epoch 23] Завершена! Суммарный лосс: -193.0687 (BPR: 20.3789, Sem: 63.9268)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2089), ('recall@50', 0.4128), ('ndcg@10', 0.1546), ('ndcg@50', 0.2121)])
+   [Epoch 24] batch 50/172 | Loss: -1.0919 (BPR: 0.1212, Sem: 0.3746)
+   [Epoch 24] batch 100/172 | Loss: -1.1695 (BPR: 0.1126, Sem: 0.3728)
+   [Epoch 24] batch 150/172 | Loss: -1.1406 (BPR: 0.1150, Sem: 0.3759)
+🏁 [Epoch 24] Завершена! Суммарный лосс: -192.2232 (BPR: 20.3420, Sem: 64.3712)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2105), ('recall@50', 0.4137), ('ndcg@10', 0.1561), ('ndcg@50', 0.2136)])
+   [Epoch 25] batch 50/172 | Loss: -1.1147 (BPR: 0.1176, Sem: 0.3776)
+   [Epoch 25] batch 100/172 | Loss: -1.1248 (BPR: 0.1189, Sem: 0.3694)
+   [Epoch 25] batch 150/172 | Loss: -1.0449 (BPR: 0.1256, Sem: 0.3782)
+🏁 [Epoch 25] Завершена! Суммарный лосс: -193.2706 (BPR: 20.0799, Sem: 64.8133)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2103), ('recall@50', 0.4165), ('ndcg@10', 0.1555), ('ndcg@50', 0.2137)])
+   [Epoch 26] batch 50/172 | Loss: -1.2675 (BPR: 0.1015, Sem: 0.3719)
+   [Epoch 26] batch 100/172 | Loss: -1.1263 (BPR: 0.1138, Sem: 0.3855)
+   [Epoch 26] batch 150/172 | Loss: -1.1538 (BPR: 0.1100, Sem: 0.3877)
+🏁 [Epoch 26] Завершена! Суммарный лосс: -195.7058 (BPR: 19.6751, Sem: 65.2147)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2099), ('recall@50', 0.4182), ('ndcg@10', 0.1552), ('ndcg@50', 0.2141)])
+   [Epoch 27] batch 50/172 | Loss: -1.1291 (BPR: 0.1161, Sem: 0.3769)
+   [Epoch 27] batch 100/172 | Loss: -1.2402 (BPR: 0.0999, Sem: 0.3886)
+   [Epoch 27] batch 150/172 | Loss: -1.0640 (BPR: 0.1219, Sem: 0.3821)
+🏁 [Epoch 27] Завершена! Суммарный лосс: -196.1378 (BPR: 19.5101, Sem: 65.6059)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2096), ('recall@50', 0.4188), ('ndcg@10', 0.1562), ('ndcg@50', 0.2154)])
+   [Epoch 28] batch 50/172 | Loss: -1.1369 (BPR: 0.1122, Sem: 0.3870)
+   [Epoch 28] batch 100/172 | Loss: -1.1157 (BPR: 0.1159, Sem: 0.3824)
+   [Epoch 28] batch 150/172 | Loss: -1.2149 (BPR: 0.1025, Sem: 0.3903)
+🏁 [Epoch 28] Завершена! Суммарный лосс: -198.7565 (BPR: 19.1056, Sem: 65.9770)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2114), ('recall@50', 0.4203), ('ndcg@10', 0.1569), ('ndcg@50', 0.216)])
+   [Epoch 29] batch 50/172 | Loss: -1.1506 (BPR: 0.1106, Sem: 0.3873)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 8.9667 | Вес Sem = 2.5963
+   Сырые лоссы: BPR = 0.1154 | Sem = 0.3846
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 8.9537 | Вес Sem = 2.5955
+   Сырые лоссы: BPR = 0.1076 | Sem = 0.3825
+   [Epoch 29] batch 100/172 | Loss: -1.0702 (BPR: 0.1215, Sem: 0.3805)
+   [Epoch 29] batch 150/172 | Loss: -1.1206 (BPR: 0.1133, Sem: 0.3894)
+🏁 [Epoch 29] Завершена! Суммарный лосс: -198.6084 (BPR: 19.0225, Sem: 66.3286)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2119), ('recall@50', 0.4221), ('ndcg@10', 0.1568), ('ndcg@50', 0.2162)])
+   [Epoch 30] batch 50/172 | Loss: -1.2325 (BPR: 0.1046, Sem: 0.3765)
+   [Epoch 30] batch 100/172 | Loss: -1.0314 (BPR: 0.1213, Sem: 0.3956)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.1186 | Вес Sem = 2.5826
+   Сырые лоссы: BPR = 0.0951 | Sem = 0.3863
+   [Epoch 30] batch 150/172 | Loss: -1.1101 (BPR: 0.1146, Sem: 0.3886)
+🏁 [Epoch 30] Завершена! Суммарный лосс: -201.6063 (BPR: 18.5915, Sem: 66.6917)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2115), ('recall@50', 0.4238), ('ndcg@10', 0.1571), ('ndcg@50', 0.2172)])
+   [Epoch 31] batch 50/172 | Loss: -1.1548 (BPR: 0.1093, Sem: 0.3902)
+   [Epoch 31] batch 100/172 | Loss: -1.1727 (BPR: 0.1073, Sem: 0.3903)
+   [Epoch 31] batch 150/172 | Loss: -1.0881 (BPR: 0.1168, Sem: 0.3884)
+🏁 [Epoch 31] Завершена! Суммарный лосс: -203.7825 (BPR: 18.2544, Sem: 67.0685)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2118), ('recall@50', 0.4255), ('ndcg@10', 0.1574), ('ndcg@50', 0.2179)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.3218 | Вес Sem = 2.5617
+   Сырые лоссы: BPR = 0.1013 | Sem = 0.3929
+   [Epoch 32] batch 50/172 | Loss: -1.2751 (BPR: 0.0954, Sem: 0.3937)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.3537 | Вес Sem = 2.5550
+   Сырые лоссы: BPR = 0.0954 | Sem = 0.3972
+   [Epoch 32] batch 100/172 | Loss: -1.3271 (BPR: 0.0904, Sem: 0.3924)
+   [Epoch 32] batch 150/172 | Loss: -1.2287 (BPR: 0.0993, Sem: 0.3982)
+🏁 [Epoch 32] Завершена! Суммарный лосс: -203.5098 (BPR: 18.1658, Sem: 67.5044)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2123), ('recall@50', 0.4269), ('ndcg@10', 0.1576), ('ndcg@50', 0.2185)])
+   [Epoch 33] batch 50/172 | Loss: -1.1488 (BPR: 0.1102, Sem: 0.3890)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.5479 | Вес Sem = 2.5396
+   Сырые лоссы: BPR = 0.1063 | Sem = 0.3949
+   [Epoch 33] batch 100/172 | Loss: -1.1043 (BPR: 0.1130, Sem: 0.3958)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.5220 | Вес Sem = 2.5393
+   Сырые лоссы: BPR = 0.1094 | Sem = 0.3945
+   [Epoch 33] batch 150/172 | Loss: -1.2862 (BPR: 0.0944, Sem: 0.3939)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.5345 | Вес Sem = 2.5385
+   Сырые лоссы: BPR = 0.1027 | Sem = 0.3994
+🏁 [Epoch 33] Завершена! Суммарный лосс: -204.5840 (BPR: 17.9844, Sem: 67.7617)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2131), ('recall@50', 0.4281), ('ndcg@10', 0.1587), ('ndcg@50', 0.2194)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.5949 | Вес Sem = 2.5308
+   Сырые лоссы: BPR = 0.1142 | Sem = 0.3913
+   [Epoch 34] batch 50/172 | Loss: -1.1853 (BPR: 0.1061, Sem: 0.3898)
+   [Epoch 34] batch 100/172 | Loss: -1.1352 (BPR: 0.1086, Sem: 0.4001)
+   [Epoch 34] batch 150/172 | Loss: -1.3873 (BPR: 0.0842, Sem: 0.3933)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.6482 | Вес Sem = 2.5284
+   Сырые лоссы: BPR = 0.0956 | Sem = 0.4018
+🏁 [Epoch 34] Завершена! Суммарный лосс: -205.9356 (BPR: 17.7669, Sem: 68.0520)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2158), ('recall@50', 0.4299), ('ndcg@10', 0.16), ('ndcg@50', 0.2204)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.6678 | Вес Sem = 2.5218
+   Сырые лоссы: BPR = 0.1066 | Sem = 0.3943
+   [Epoch 35] batch 50/172 | Loss: -1.2372 (BPR: 0.0995, Sem: 0.3944)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 9.7853 | Вес Sem = 2.5264
+   Сырые лоссы: BPR = 0.1071 | Sem = 0.3957
+   [Epoch 35] batch 100/172 | Loss: -1.1039 (BPR: 0.1130, Sem: 0.3951)
+   [Epoch 35] batch 150/172 | Loss: -1.1039 (BPR: 0.1117, Sem: 0.4002)
+🏁 [Epoch 35] Завершена! Суммарный лосс: -207.8043 (BPR: 17.5513, Sem: 68.1443)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2161), ('recall@50', 0.4306), ('ndcg@10', 0.1602), ('ndcg@50', 0.2207)])
+   [Epoch 36] batch 50/172 | Loss: -1.2023 (BPR: 0.1023, Sem: 0.3975)
+   [Epoch 36] batch 100/172 | Loss: -1.2437 (BPR: 0.0990, Sem: 0.3941)
+   [Epoch 36] batch 150/172 | Loss: -1.2830 (BPR: 0.0936, Sem: 0.3998)
+🏁 [Epoch 36] Завершена! Суммарный лосс: -210.8269 (BPR: 17.2113, Sem: 68.2755)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2158), ('recall@50', 0.4333), ('ndcg@10', 0.1607), ('ndcg@50', 0.2218)])
+   [Epoch 37] batch 50/172 | Loss: -1.2427 (BPR: 0.0979, Sem: 0.3991)
+   [Epoch 37] batch 100/172 | Loss: -1.2104 (BPR: 0.1009, Sem: 0.3997)
+   [Epoch 37] batch 150/172 | Loss: -1.3323 (BPR: 0.0897, Sem: 0.3962)
+🏁 [Epoch 37] Завершена! Суммарный лосс: -212.5711 (BPR: 16.9679, Sem: 68.5607)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2169), ('recall@50', 0.4344), ('ndcg@10', 0.1619), ('ndcg@50', 0.2232)])
+   [Epoch 38] batch 50/172 | Loss: -1.2470 (BPR: 0.0958, Sem: 0.4058)
+   [Epoch 38] batch 100/172 | Loss: -1.3638 (BPR: 0.0874, Sem: 0.3929)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.0753 | Вес Sem = 2.5113
+   Сырые лоссы: BPR = 0.1095 | Sem = 0.3972
+   [Epoch 38] batch 150/172 | Loss: -1.1904 (BPR: 0.1033, Sem: 0.3979)
+🏁 [Epoch 38] Завершена! Суммарный лосс: -211.7483 (BPR: 17.0482, Sem: 68.5680)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2164), ('recall@50', 0.437), ('ndcg@10', 0.1615), ('ndcg@50', 0.2234)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.0799 | Вес Sem = 2.5065
+   Сырые лоссы: BPR = 0.0912 | Sem = 0.3971
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.0877 | Вес Sem = 2.5053
+   Сырые лоссы: BPR = 0.0937 | Sem = 0.3994
+   [Epoch 39] batch 50/172 | Loss: -1.2332 (BPR: 0.0995, Sem: 0.3964)
+   [Epoch 39] batch 100/172 | Loss: -1.2765 (BPR: 0.0935, Sem: 0.4031)
+   [Epoch 39] batch 150/172 | Loss: -1.2540 (BPR: 0.0967, Sem: 0.3993)
+🏁 [Epoch 39] Завершена! Суммарный лосс: -213.3837 (BPR: 16.8534, Sem: 68.7033)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2174), ('recall@50', 0.438), ('ndcg@10', 0.1624), ('ndcg@50', 0.2243)])
+   [Epoch 40] batch 50/172 | Loss: -1.0917 (BPR: 0.1130, Sem: 0.3968)
+   [Epoch 40] batch 100/172 | Loss: -1.1321 (BPR: 0.1077, Sem: 0.4024)
+   [Epoch 40] batch 150/172 | Loss: -1.1024 (BPR: 0.1114, Sem: 0.3995)
+🏁 [Epoch 40] Завершена! Суммарный лосс: -215.9641 (BPR: 16.5792, Sem: 68.7961)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2173), ('recall@50', 0.4395), ('ndcg@10', 0.1627), ('ndcg@50', 0.2251)])
+   [Epoch 41] batch 50/172 | Loss: -1.1997 (BPR: 0.1019, Sem: 0.3996)
+   [Epoch 41] batch 100/172 | Loss: -1.2336 (BPR: 0.0971, Sem: 0.4058)
+   [Epoch 41] batch 150/172 | Loss: -1.3932 (BPR: 0.0826, Sem: 0.4032)
+🏁 [Epoch 41] Завершена! Суммарный лосс: -218.0542 (BPR: 16.3337, Sem: 68.9879)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2178), ('recall@50', 0.4398), ('ndcg@10', 0.1633), ('ndcg@50', 0.2255)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.5233 | Вес Sem = 2.4940
+   Сырые лоссы: BPR = 0.1099 | Sem = 0.4044
+   [Epoch 42] batch 50/172 | Loss: -1.2059 (BPR: 0.1014, Sem: 0.3988)
+   [Epoch 42] batch 100/172 | Loss: -1.2844 (BPR: 0.0921, Sem: 0.4066)
+   [Epoch 42] batch 150/172 | Loss: -1.2011 (BPR: 0.1018, Sem: 0.3992)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.4509 | Вес Sem = 2.4855
+   Сырые лоссы: BPR = 0.0853 | Sem = 0.4043
+🏁 [Epoch 42] Завершена! Суммарный лосс: -216.4853 (BPR: 16.4298, Sem: 69.2167)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2174), ('recall@50', 0.4414), ('ndcg@10', 0.1634), ('ndcg@50', 0.226)])
+   [Epoch 43] batch 50/172 | Loss: -1.3041 (BPR: 0.0905, Sem: 0.4054)
+   [Epoch 43] batch 100/172 | Loss: -1.2412 (BPR: 0.0982, Sem: 0.3978)
+   [Epoch 43] batch 150/172 | Loss: -1.2628 (BPR: 0.0949, Sem: 0.4033)
+🏁 [Epoch 43] Завершена! Суммарный лосс: -220.4852 (BPR: 16.0417, Sem: 69.2534)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2172), ('recall@50', 0.4421), ('ndcg@10', 0.1638), ('ndcg@50', 0.2267)])
+   [Epoch 44] batch 50/172 | Loss: -1.3334 (BPR: 0.0897, Sem: 0.3974)
+   [Epoch 44] batch 100/172 | Loss: -1.2851 (BPR: 0.0927, Sem: 0.4039)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.7922 | Вес Sem = 2.4827
+   Сырые лоссы: BPR = 0.0847 | Sem = 0.4009
+   [Epoch 44] batch 150/172 | Loss: -1.2753 (BPR: 0.0938, Sem: 0.4028)
+🏁 [Epoch 44] Завершена! Суммарный лосс: -221.8222 (BPR: 15.9113, Sem: 69.2858)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2172), ('recall@50', 0.442), ('ndcg@10', 0.1637), ('ndcg@50', 0.2266)])
+   [Epoch 45] batch 50/172 | Loss: -1.2929 (BPR: 0.0915, Sem: 0.4058)
+   [Epoch 45] batch 100/172 | Loss: -1.2258 (BPR: 0.0983, Sem: 0.4034)
+   [Epoch 45] batch 150/172 | Loss: -1.3171 (BPR: 0.0901, Sem: 0.4024)
+🏁 [Epoch 45] Завершена! Суммарный лосс: -223.3857 (BPR: 15.7460, Sem: 69.3798)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2184), ('recall@50', 0.4434), ('ndcg@10', 0.1639), ('ndcg@50', 0.2268)])
+   [Epoch 46] batch 50/172 | Loss: -1.2727 (BPR: 0.0943, Sem: 0.4017)
+   [Epoch 46] batch 100/172 | Loss: -1.2497 (BPR: 0.0969, Sem: 0.3997)
+   [Epoch 46] batch 150/172 | Loss: -1.1208 (BPR: 0.1075, Sem: 0.4046)
+🏁 [Epoch 46] Завершена! Суммарный лосс: -223.1258 (BPR: 15.7427, Sem: 69.5013)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2196), ('recall@50', 0.4443), ('ndcg@10', 0.165), ('ndcg@50', 0.2278)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.9048 | Вес Sem = 2.4729
+   Сырые лоссы: BPR = 0.0861 | Sem = 0.4084
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 10.9142 | Вес Sem = 2.4670
+   Сырые лоссы: BPR = 0.0893 | Sem = 0.4017
+   [Epoch 47] batch 50/172 | Loss: -1.2737 (BPR: 0.0942, Sem: 0.4020)
+   [Epoch 47] batch 100/172 | Loss: -1.2684 (BPR: 0.0952, Sem: 0.3995)
+   [Epoch 47] batch 150/172 | Loss: -1.3819 (BPR: 0.0836, Sem: 0.4051)
+🏁 [Epoch 47] Завершена! Суммарный лосс: -225.6220 (BPR: 15.4949, Sem: 69.5905)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.219), ('recall@50', 0.4441), ('ndcg@10', 0.165), ('ndcg@50', 0.2281)])
+   [Epoch 48] batch 50/172 | Loss: -1.3083 (BPR: 0.0903, Sem: 0.4050)
+   [Epoch 48] batch 100/172 | Loss: -1.1937 (BPR: 0.1004, Sem: 0.4055)
+   [Epoch 48] batch 150/172 | Loss: -1.1358 (BPR: 0.1053, Sem: 0.4070)
+🏁 [Epoch 48] Завершена! Суммарный лосс: -226.4393 (BPR: 15.4087, Sem: 69.6516)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2214), ('recall@50', 0.4446), ('ndcg@10', 0.1661), ('ndcg@50', 0.2286)])
+   [Epoch 49] batch 50/172 | Loss: -1.1052 (BPR: 0.1078, Sem: 0.4086)
+   [Epoch 49] batch 100/172 | Loss: -1.2935 (BPR: 0.0909, Sem: 0.4083)
+   [Epoch 49] batch 150/172 | Loss: -1.2370 (BPR: 0.0956, Sem: 0.4099)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 11.1546 | Вес Sem = 2.4721
+   Сырые лоссы: BPR = 0.0758 | Sem = 0.4097
+🏁 [Epoch 49] Завершена! Суммарный лосс: -226.9440 (BPR: 15.3674, Sem: 69.6343)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2206), ('recall@50', 0.4468), ('ndcg@10', 0.1662), ('ndcg@50', 0.2294)])
+   [Epoch 50] batch 50/172 | Loss: -1.2307 (BPR: 0.0963, Sem: 0.4091)
+   [Epoch 50] batch 100/172 | Loss: -1.4854 (BPR: 0.0752, Sem: 0.4022)
+   [Epoch 50] batch 150/172 | Loss: -1.2825 (BPR: 0.0934, Sem: 0.4014)
+🏁 [Epoch 50] Завершена! Суммарный лосс: -226.9542 (BPR: 15.3123, Sem: 69.8799)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2216), ('recall@50', 0.4478), ('ndcg@10', 0.1665), ('ndcg@50', 0.2296)])
+   [Epoch 51] batch 50/172 | Loss: -1.2031 (BPR: 0.0999, Sem: 0.4041)
+   [Epoch 51] batch 100/172 | Loss: -1.4907 (BPR: 0.0733, Sem: 0.4089)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 11.3353 | Вес Sem = 2.4628
+   Сырые лоссы: BPR = 0.0806 | Sem = 0.4031
+   [Epoch 51] batch 150/172 | Loss: -1.3172 (BPR: 0.0895, Sem: 0.4052)
+🏁 [Epoch 51] Завершена! Суммарный лосс: -228.9979 (BPR: 15.1356, Sem: 69.8600)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2207), ('recall@50', 0.4493), ('ndcg@10', 0.1658), ('ndcg@50', 0.2295)])
+   [Epoch 52] batch 50/172 | Loss: -1.2910 (BPR: 0.0904, Sem: 0.4114)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 11.4528 | Вес Sem = 2.4549
+   Сырые лоссы: BPR = 0.0884 | Sem = 0.4092
+   [Epoch 52] batch 100/172 | Loss: -1.4465 (BPR: 0.0782, Sem: 0.4049)
+   [Epoch 52] batch 150/172 | Loss: -1.4148 (BPR: 0.0799, Sem: 0.4100)
+🏁 [Epoch 52] Завершена! Суммарный лосс: -230.3833 (BPR: 14.9948, Sem: 69.9530)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.221), ('recall@50', 0.449), ('ndcg@10', 0.166), ('ndcg@50', 0.2297)])
+   [Epoch 53] batch 50/172 | Loss: -1.2759 (BPR: 0.0913, Sem: 0.4131)
+   [Epoch 53] batch 100/172 | Loss: -1.3469 (BPR: 0.0878, Sem: 0.4009)
+   [Epoch 53] batch 150/172 | Loss: -1.3409 (BPR: 0.0869, Sem: 0.4071)
+🏁 [Epoch 53] Завершена! Суммарный лосс: -233.0677 (BPR: 14.7430, Sem: 70.0445)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2219), ('recall@50', 0.4501), ('ndcg@10', 0.1663), ('ndcg@50', 0.23)])
+   [Epoch 54] batch 50/172 | Loss: -1.4083 (BPR: 0.0808, Sem: 0.4090)
+   [Epoch 54] batch 100/172 | Loss: -1.2823 (BPR: 0.0911, Sem: 0.4109)
+   [Epoch 54] batch 150/172 | Loss: -1.4714 (BPR: 0.0765, Sem: 0.4037)
+🏁 [Epoch 54] Завершена! Суммарный лосс: -235.5515 (BPR: 14.5435, Sem: 69.9854)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2225), ('recall@50', 0.4519), ('ndcg@10', 0.1671), ('ndcg@50', 0.2311)])
+   [Epoch 55] batch 50/172 | Loss: -1.3049 (BPR: 0.0902, Sem: 0.4061)
+   [Epoch 55] batch 100/172 | Loss: -1.3400 (BPR: 0.0873, Sem: 0.4055)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 11.8098 | Вес Sem = 2.4571
+   Сырые лоссы: BPR = 0.0854 | Sem = 0.4054
+   [Epoch 55] batch 150/172 | Loss: -1.4994 (BPR: 0.0728, Sem: 0.4106)
+🏁 [Epoch 55] Завершена! Суммарный лосс: -234.9939 (BPR: 14.5727, Sem: 70.0742)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.223), ('recall@50', 0.4532), ('ndcg@10', 0.1668), ('ndcg@50', 0.2308)])
+   [Epoch 56] batch 50/172 | Loss: -1.2694 (BPR: 0.0928, Sem: 0.4081)
+   [Epoch 56] batch 100/172 | Loss: -1.3428 (BPR: 0.0878, Sem: 0.4023)
+   [Epoch 56] batch 150/172 | Loss: -1.3037 (BPR: 0.0896, Sem: 0.4097)
+🏁 [Epoch 56] Завершена! Суммарный лосс: -235.8995 (BPR: 14.4961, Sem: 70.0749)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2214), ('recall@50', 0.4542), ('ndcg@10', 0.1666), ('ndcg@50', 0.2313)])
+   [Epoch 57] batch 50/172 | Loss: -1.2215 (BPR: 0.0968, Sem: 0.4080)
+   [Epoch 57] batch 100/172 | Loss: -1.3829 (BPR: 0.0839, Sem: 0.4046)
+   [Epoch 57] batch 150/172 | Loss: -1.4748 (BPR: 0.0758, Sem: 0.4062)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 11.8179 | Вес Sem = 2.4500
+   Сырые лоссы: BPR = 0.0938 | Sem = 0.4079
+🏁 [Epoch 57] Завершена! Суммарный лосс: -234.9082 (BPR: 14.5641, Sem: 70.1506)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2212), ('recall@50', 0.4534), ('ndcg@10', 0.1665), ('ndcg@50', 0.2313)])
+   [Epoch 58] batch 50/172 | Loss: -1.3511 (BPR: 0.0860, Sem: 0.4072)
+   [Epoch 58] batch 100/172 | Loss: -1.3575 (BPR: 0.0856, Sem: 0.4064)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.0458 | Вес Sem = 2.4392
+   Сырые лоссы: BPR = 0.0778 | Sem = 0.4116
+   [Epoch 58] batch 150/172 | Loss: -1.3667 (BPR: 0.0841, Sem: 0.4101)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.0499 | Вес Sem = 2.4467
+   Сырые лоссы: BPR = 0.0826 | Sem = 0.4107
+🏁 [Epoch 58] Завершена! Суммарный лосс: -238.7443 (BPR: 14.2100, Sem: 70.3064)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2219), ('recall@50', 0.4549), ('ndcg@10', 0.167), ('ndcg@50', 0.232)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.0767 | Вес Sem = 2.4462
+   Сырые лоссы: BPR = 0.0873 | Sem = 0.4042
+   [Epoch 59] batch 50/172 | Loss: -1.3668 (BPR: 0.0845, Sem: 0.4079)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.1296 | Вес Sem = 2.4482
+   Сырые лоссы: BPR = 0.0742 | Sem = 0.4103
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.1536 | Вес Sem = 2.4440
+   Сырые лоссы: BPR = 0.0903 | Sem = 0.4118
+   [Epoch 59] batch 100/172 | Loss: -1.4104 (BPR: 0.0808, Sem: 0.4089)
+   [Epoch 59] batch 150/172 | Loss: -1.4034 (BPR: 0.0821, Sem: 0.4050)
+🏁 [Epoch 59] Завершена! Суммарный лосс: -238.5242 (BPR: 14.2299, Sem: 70.3046)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2219), ('recall@50', 0.4555), ('ndcg@10', 0.1673), ('ndcg@50', 0.2327)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.0981 | Вес Sem = 2.4481
+   Сырые лоссы: BPR = 0.1039 | Sem = 0.4115
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.0956 | Вес Sem = 2.4418
+   Сырые лоссы: BPR = 0.0806 | Sem = 0.4005
+   [Epoch 60] batch 50/172 | Loss: -1.5138 (BPR: 0.0715, Sem: 0.4122)
+   [Epoch 60] batch 100/172 | Loss: -1.5128 (BPR: 0.0725, Sem: 0.4083)
+   [Epoch 60] batch 150/172 | Loss: -1.3372 (BPR: 0.0869, Sem: 0.4083)
+🏁 [Epoch 60] Завершена! Суммарный лосс: -240.5543 (BPR: 14.0628, Sem: 70.3032)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2222), ('recall@50', 0.4559), ('ndcg@10', 0.1678), ('ndcg@50', 0.2332)])
+   [Epoch 61] batch 50/172 | Loss: -1.4408 (BPR: 0.0791, Sem: 0.4046)
+   [Epoch 61] batch 100/172 | Loss: -1.3336 (BPR: 0.0876, Sem: 0.4059)
+   [Epoch 61] batch 150/172 | Loss: -1.3780 (BPR: 0.0828, Sem: 0.4121)
+🏁 [Epoch 61] Завершена! Суммарный лосс: -242.3233 (BPR: 13.8950, Sem: 70.4257)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2231), ('recall@50', 0.456), ('ndcg@10', 0.1682), ('ndcg@50', 0.2334)])
+   [Epoch 62] batch 50/172 | Loss: -1.3444 (BPR: 0.0861, Sem: 0.4090)
+   [Epoch 62] batch 100/172 | Loss: -1.4169 (BPR: 0.0799, Sem: 0.4108)
+   [Epoch 62] batch 150/172 | Loss: -1.5993 (BPR: 0.0642, Sem: 0.4142)
+🏁 [Epoch 62] Завершена! Суммарный лосс: -241.2410 (BPR: 13.9737, Sem: 70.4685)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2242), ('recall@50', 0.4581), ('ndcg@10', 0.1688), ('ndcg@50', 0.2343)])
+   [Epoch 63] batch 50/172 | Loss: -1.5382 (BPR: 0.0705, Sem: 0.4092)
+   [Epoch 63] batch 100/172 | Loss: -1.3982 (BPR: 0.0816, Sem: 0.4097)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.4958 | Вес Sem = 2.4488
+   Сырые лоссы: BPR = 0.0823 | Sem = 0.4083
+   [Epoch 63] batch 150/172 | Loss: -1.4262 (BPR: 0.0792, Sem: 0.4106)
+🏁 [Epoch 63] Завершена! Суммарный лосс: -244.9961 (BPR: 13.6720, Sem: 70.4665)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.224), ('recall@50', 0.4604), ('ndcg@10', 0.1694), ('ndcg@50', 0.2357)])
+   [Epoch 64] batch 50/172 | Loss: -1.4540 (BPR: 0.0769, Sem: 0.4107)
+   [Epoch 64] batch 100/172 | Loss: -1.4912 (BPR: 0.0734, Sem: 0.4134)
+   [Epoch 64] batch 150/172 | Loss: -1.2789 (BPR: 0.0918, Sem: 0.4058)
+🏁 [Epoch 64] Завершена! Суммарный лосс: -244.0973 (BPR: 13.7417, Sem: 70.4816)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.224), ('recall@50', 0.4619), ('ndcg@10', 0.1688), ('ndcg@50', 0.2354)])
+   [Epoch 65] batch 50/172 | Loss: -1.4968 (BPR: 0.0737, Sem: 0.4097)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.6142 | Вес Sem = 2.4345
+   Сырые лоссы: BPR = 0.0901 | Sem = 0.4087
+   [Epoch 65] batch 100/172 | Loss: -1.3026 (BPR: 0.0887, Sem: 0.4118)
+   [Epoch 65] batch 150/172 | Loss: -1.4210 (BPR: 0.0783, Sem: 0.4171)
+🏁 [Epoch 65] Завершена! Суммарный лосс: -245.4240 (BPR: 13.6134, Sem: 70.5972)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2236), ('recall@50', 0.4608), ('ndcg@10', 0.1691), ('ndcg@50', 0.2356)])
+   [Epoch 66] batch 50/172 | Loss: -1.4682 (BPR: 0.0755, Sem: 0.4126)
+   [Epoch 66] batch 100/172 | Loss: -1.4136 (BPR: 0.0794, Sem: 0.4145)
+   [Epoch 66] batch 150/172 | Loss: -1.3716 (BPR: 0.0829, Sem: 0.4135)
+🏁 [Epoch 66] Завершена! Суммарный лосс: -247.1787 (BPR: 13.4763, Sem: 70.5903)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2242), ('recall@50', 0.463), ('ndcg@10', 0.1691), ('ndcg@50', 0.2359)])
+   [Epoch 67] batch 50/172 | Loss: -1.3975 (BPR: 0.0804, Sem: 0.4158)
+   [Epoch 67] batch 100/172 | Loss: -1.3316 (BPR: 0.0863, Sem: 0.4122)
+   [Epoch 67] batch 150/172 | Loss: -1.6470 (BPR: 0.0615, Sem: 0.4118)
+🏁 [Epoch 67] Завершена! Суммарный лосс: -247.1315 (BPR: 13.4848, Sem: 70.5682)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2254), ('recall@50', 0.4644), ('ndcg@10', 0.1703), ('ndcg@50', 0.2371)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.9683 | Вес Sem = 2.4287
+   Сырые лоссы: BPR = 0.0792 | Sem = 0.4085
+   [Epoch 68] batch 50/172 | Loss: -1.4307 (BPR: 0.0792, Sem: 0.4085)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.9726 | Вес Sem = 2.4357
+   Сырые лоссы: BPR = 0.0791 | Sem = 0.4114
+   [Epoch 68] batch 100/172 | Loss: -1.5397 (BPR: 0.0699, Sem: 0.4133)
+   [Epoch 68] batch 150/172 | Loss: -1.5523 (BPR: 0.0693, Sem: 0.4109)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.7974 | Вес Sem = 2.4405
+   Сырые лоссы: BPR = 0.0740 | Sem = 0.4090
+🏁 [Epoch 68] Завершена! Суммарный лосс: -248.7929 (BPR: 13.3438, Sem: 70.6262)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2262), ('recall@50', 0.4649), ('ndcg@10', 0.17), ('ndcg@50', 0.2367)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.9366 | Вес Sem = 2.4279
+   Сырые лоссы: BPR = 0.0714 | Sem = 0.4088
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 12.9514 | Вес Sem = 2.4257
+   Сырые лоссы: BPR = 0.0837 | Sem = 0.4118
+   [Epoch 69] batch 50/172 | Loss: -1.3549 (BPR: 0.0849, Sem: 0.4092)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.0152 | Вес Sem = 2.4311
+   Сырые лоссы: BPR = 0.0796 | Sem = 0.4101
+   [Epoch 69] batch 100/172 | Loss: -1.5940 (BPR: 0.0665, Sem: 0.4094)
+   [Epoch 69] batch 150/172 | Loss: -1.5879 (BPR: 0.0665, Sem: 0.4118)
+🏁 [Epoch 69] Завершена! Суммарный лосс: -251.5054 (BPR: 13.1269, Sem: 70.6651)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2269), ('recall@50', 0.4662), ('ndcg@10', 0.1704), ('ndcg@50', 0.2375)])
+   [Epoch 70] batch 50/172 | Loss: -1.5661 (BPR: 0.0676, Sem: 0.4148)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.0471 | Вес Sem = 2.4302
+   Сырые лоссы: BPR = 0.0739 | Sem = 0.4097
+   [Epoch 70] batch 100/172 | Loss: -1.6067 (BPR: 0.0664, Sem: 0.4046)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.0979 | Вес Sem = 2.4330
+   Сырые лоссы: BPR = 0.0646 | Sem = 0.4124
+   [Epoch 70] batch 150/172 | Loss: -1.4409 (BPR: 0.0780, Sem: 0.4107)
+🏁 [Epoch 70] Завершена! Суммарный лосс: -251.6416 (BPR: 13.1029, Sem: 70.7448)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2253), ('recall@50', 0.4654), ('ndcg@10', 0.1704), ('ndcg@50', 0.2378)])
+   [Epoch 71] batch 50/172 | Loss: -1.4614 (BPR: 0.0768, Sem: 0.4087)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.2014 | Вес Sem = 2.4413
+   Сырые лоссы: BPR = 0.0864 | Sem = 0.4071
+   [Epoch 71] batch 100/172 | Loss: -1.4168 (BPR: 0.0802, Sem: 0.4085)
+   [Epoch 71] batch 150/172 | Loss: -1.5201 (BPR: 0.0718, Sem: 0.4117)
+🏁 [Epoch 71] Завершена! Суммарный лосс: -253.5899 (BPR: 12.9718, Sem: 70.6560)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2261), ('recall@50', 0.4679), ('ndcg@10', 0.1709), ('ndcg@50', 0.2386)])
+   [Epoch 72] batch 50/172 | Loss: -1.5349 (BPR: 0.0709, Sem: 0.4106)
+   [Epoch 72] batch 100/172 | Loss: -1.5234 (BPR: 0.0710, Sem: 0.4147)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.4397 | Вес Sem = 2.4282
+   Сырые лоссы: BPR = 0.0736 | Sem = 0.4120
+   [Epoch 72] batch 150/172 | Loss: -1.4463 (BPR: 0.0774, Sem: 0.4112)
+🏁 [Epoch 72] Завершена! Суммарный лосс: -254.7126 (BPR: 12.8608, Sem: 70.8015)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2268), ('recall@50', 0.4688), ('ndcg@10', 0.1711), ('ndcg@50', 0.2385)])
+   [Epoch 73] batch 50/172 | Loss: -1.4269 (BPR: 0.0783, Sem: 0.4145)
+   [Epoch 73] batch 100/172 | Loss: -1.4645 (BPR: 0.0751, Sem: 0.4168)
+   [Epoch 73] batch 150/172 | Loss: -1.3779 (BPR: 0.0829, Sem: 0.4091)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.4577 | Вес Sem = 2.4413
+   Сырые лоссы: BPR = 0.0783 | Sem = 0.4072
+🏁 [Epoch 73] Завершена! Суммарный лосс: -255.6330 (BPR: 12.7961, Sem: 70.7795)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2273), ('recall@50', 0.4681), ('ndcg@10', 0.1715), ('ndcg@50', 0.2387)])
+   [Epoch 74] batch 50/172 | Loss: -1.5066 (BPR: 0.0726, Sem: 0.4133)
+   [Epoch 74] batch 100/172 | Loss: -1.5714 (BPR: 0.0684, Sem: 0.4095)
+   [Epoch 74] batch 150/172 | Loss: -1.4760 (BPR: 0.0747, Sem: 0.4141)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.5205 | Вес Sem = 2.4327
+   Сырые лоссы: BPR = 0.0679 | Sem = 0.4100
+🏁 [Epoch 74] Завершена! Суммарный лосс: -256.5024 (BPR: 12.7302, Sem: 70.7874)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2273), ('recall@50', 0.4704), ('ndcg@10', 0.1714), ('ndcg@50', 0.239)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.5305 | Вес Sem = 2.4304
+   Сырые лоссы: BPR = 0.0789 | Sem = 0.4082
+   [Epoch 75] batch 50/172 | Loss: -1.4052 (BPR: 0.0807, Sem: 0.4097)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.5151 | Вес Sem = 2.4308
+   Сырые лоссы: BPR = 0.0740 | Sem = 0.4107
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.4900 | Вес Sem = 2.4262
+   Сырые лоссы: BPR = 0.0639 | Sem = 0.4087
+   [Epoch 75] batch 100/172 | Loss: -1.6349 (BPR: 0.0639, Sem: 0.4087)
+   [Epoch 75] batch 150/172 | Loss: -1.4310 (BPR: 0.0787, Sem: 0.4101)
+🏁 [Epoch 75] Завершена! Суммарный лосс: -257.4644 (BPR: 12.6509, Sem: 70.8345)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2277), ('recall@50', 0.4715), ('ndcg@10', 0.1715), ('ndcg@50', 0.2397)])
+   [Epoch 76] batch 50/172 | Loss: -1.5848 (BPR: 0.0667, Sem: 0.4141)
+   [Epoch 76] batch 100/172 | Loss: -1.5404 (BPR: 0.0704, Sem: 0.4116)
+   [Epoch 76] batch 150/172 | Loss: -1.4723 (BPR: 0.0763, Sem: 0.4063)
+🏁 [Epoch 76] Завершена! Суммарный лосс: -259.5955 (BPR: 12.5139, Sem: 70.7262)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2286), ('recall@50', 0.4718), ('ndcg@10', 0.1717), ('ndcg@50', 0.2396)])
+   [Epoch 77] batch 50/172 | Loss: -1.4147 (BPR: 0.0792, Sem: 0.4137)
+   [Epoch 77] batch 100/172 | Loss: -1.3746 (BPR: 0.0830, Sem: 0.4090)
+   [Epoch 77] batch 150/172 | Loss: -1.3436 (BPR: 0.0851, Sem: 0.4097)
+🏁 [Epoch 77] Завершена! Суммарный лосс: -258.5346 (BPR: 12.5738, Sem: 70.8260)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2288), ('recall@50', 0.4712), ('ndcg@10', 0.1719), ('ndcg@50', 0.2398)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.7827 | Вес Sem = 2.4204
+   Сырые лоссы: BPR = 0.0663 | Sem = 0.4133
+   [Epoch 78] batch 50/172 | Loss: -1.5932 (BPR: 0.0663, Sem: 0.4133)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.8107 | Вес Sem = 2.4251
+   Сырые лоссы: BPR = 0.0642 | Sem = 0.4207
+   [Epoch 78] batch 100/172 | Loss: -1.5737 (BPR: 0.0677, Sem: 0.4136)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.8960 | Вес Sem = 2.4260
+   Сырые лоссы: BPR = 0.0663 | Sem = 0.4109
+   [Epoch 78] batch 150/172 | Loss: -1.6568 (BPR: 0.0620, Sem: 0.4119)
+🏁 [Epoch 78] Завершена! Суммарный лосс: -262.3970 (BPR: 12.2905, Sem: 70.8468)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2301), ('recall@50', 0.4739), ('ndcg@10', 0.1724), ('ndcg@50', 0.2405)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.0079 | Вес Sem = 2.4294
+   Сырые лоссы: BPR = 0.0785 | Sem = 0.4104
+   [Epoch 79] batch 50/172 | Loss: -1.4672 (BPR: 0.0758, Sem: 0.4110)
+   [Epoch 79] batch 100/172 | Loss: -1.4643 (BPR: 0.0758, Sem: 0.4119)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.9594 | Вес Sem = 2.4149
+   Сырые лоссы: BPR = 0.0677 | Sem = 0.4138
+   [Epoch 79] batch 150/172 | Loss: -1.4788 (BPR: 0.0744, Sem: 0.4145)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 13.8521 | Вес Sem = 2.4276
+   Сырые лоссы: BPR = 0.0792 | Sem = 0.4136
+🏁 [Epoch 79] Завершена! Суммарный лосс: -261.1611 (BPR: 12.3785, Sem: 70.8536)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2313), ('recall@50', 0.4756), ('ndcg@10', 0.1733), ('ndcg@50', 0.2412)])
+   [Epoch 80] batch 50/172 | Loss: -1.5434 (BPR: 0.0705, Sem: 0.4104)
+   [Epoch 80] batch 100/172 | Loss: -1.3991 (BPR: 0.0807, Sem: 0.4106)
+   [Epoch 80] batch 150/172 | Loss: -1.4467 (BPR: 0.0767, Sem: 0.4142)
+🏁 [Epoch 80] Завершена! Суммарный лосс: -262.8119 (BPR: 12.2463, Sem: 70.9317)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2308), ('recall@50', 0.4759), ('ndcg@10', 0.1731), ('ndcg@50', 0.2415)])
+   [Epoch 81] batch 50/172 | Loss: -1.5796 (BPR: 0.0676, Sem: 0.4119)
+   [Epoch 81] batch 100/172 | Loss: -1.5749 (BPR: 0.0678, Sem: 0.4130)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.1692 | Вес Sem = 2.4289
+   Сырые лоссы: BPR = 0.0764 | Sem = 0.4198
+   [Epoch 81] batch 150/172 | Loss: -1.6507 (BPR: 0.0631, Sem: 0.4090)
+🏁 [Epoch 81] Завершена! Суммарный лосс: -264.5930 (BPR: 12.1270, Sem: 70.8938)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2317), ('recall@50', 0.4759), ('ndcg@10', 0.1735), ('ndcg@50', 0.2414)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.1617 | Вес Sem = 2.4205
+   Сырые лоссы: BPR = 0.0772 | Sem = 0.4110
+   [Epoch 82] batch 50/172 | Loss: -1.4283 (BPR: 0.0783, Sem: 0.4115)
+   [Epoch 82] batch 100/172 | Loss: -1.5586 (BPR: 0.0694, Sem: 0.4106)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.2818 | Вес Sem = 2.4282
+   Сырые лоссы: BPR = 0.0704 | Sem = 0.4192
+   [Epoch 82] batch 150/172 | Loss: -1.4849 (BPR: 0.0733, Sem: 0.4180)
+🏁 [Epoch 82] Завершена! Суммарный лосс: -265.8129 (BPR: 12.0368, Sem: 70.9205)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2316), ('recall@50', 0.4765), ('ndcg@10', 0.1738), ('ndcg@50', 0.242)])
+   [Epoch 83] batch 50/172 | Loss: -1.6980 (BPR: 0.0600, Sem: 0.4082)
+   [Epoch 83] batch 100/172 | Loss: -1.6752 (BPR: 0.0603, Sem: 0.4158)
+   [Epoch 83] batch 150/172 | Loss: -1.6769 (BPR: 0.0601, Sem: 0.4168)
+🏁 [Epoch 83] Завершена! Суммарный лосс: -266.5173 (BPR: 11.9871, Sem: 70.9237)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2324), ('recall@50', 0.4765), ('ndcg@10', 0.1738), ('ndcg@50', 0.2419)])
+   [Epoch 84] batch 50/172 | Loss: -1.5262 (BPR: 0.0709, Sem: 0.4145)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.4477 | Вес Sem = 2.4254
+   Сырые лоссы: BPR = 0.0687 | Sem = 0.4088
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.4189 | Вес Sem = 2.4299
+   Сырые лоссы: BPR = 0.0611 | Sem = 0.4164
+   [Epoch 84] batch 100/172 | Loss: -1.4455 (BPR: 0.0776, Sem: 0.4080)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.4243 | Вес Sem = 2.4264
+   Сырые лоссы: BPR = 0.0684 | Sem = 0.4119
+   [Epoch 84] batch 150/172 | Loss: -1.5159 (BPR: 0.0720, Sem: 0.4128)
+🏁 [Epoch 84] Завершена! Суммарный лосс: -268.1884 (BPR: 11.8770, Sem: 70.8850)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2336), ('recall@50', 0.4782), ('ndcg@10', 0.1746), ('ndcg@50', 0.2426)])
+   [Epoch 85] batch 50/172 | Loss: -1.5820 (BPR: 0.0674, Sem: 0.4128)
+   [Epoch 85] batch 100/172 | Loss: -1.5319 (BPR: 0.0705, Sem: 0.4146)
+   [Epoch 85] batch 150/172 | Loss: -1.4940 (BPR: 0.0735, Sem: 0.4125)
+🏁 [Epoch 85] Завершена! Суммарный лосс: -269.2574 (BPR: 11.7937, Sem: 70.9460)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2336), ('recall@50', 0.478), ('ndcg@10', 0.1745), ('ndcg@50', 0.2425)])
+   [Epoch 86] batch 50/172 | Loss: -1.5952 (BPR: 0.0669, Sem: 0.4100)
+   [Epoch 86] batch 100/172 | Loss: -1.5864 (BPR: 0.0676, Sem: 0.4095)
+   [Epoch 86] batch 150/172 | Loss: -1.5714 (BPR: 0.0679, Sem: 0.4141)
+🏁 [Epoch 86] Завершена! Суммарный лосс: -268.3575 (BPR: 11.8538, Sem: 70.9576)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2334), ('recall@50', 0.4788), ('ndcg@10', 0.1745), ('ndcg@50', 0.2429)])
+   [Epoch 87] batch 50/172 | Loss: -1.5702 (BPR: 0.0681, Sem: 0.4131)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.6562 | Вес Sem = 2.4156
+   Сырые лоссы: BPR = 0.0721 | Sem = 0.4121
+   [Epoch 87] batch 100/172 | Loss: -1.6056 (BPR: 0.0660, Sem: 0.4115)
+   [Epoch 87] batch 150/172 | Loss: -1.4702 (BPR: 0.0744, Sem: 0.4166)
+🏁 [Epoch 87] Завершена! Суммарный лосс: -269.5687 (BPR: 11.7550, Sem: 71.0508)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2332), ('recall@50', 0.4792), ('ndcg@10', 0.1745), ('ndcg@50', 0.2432)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.6468 | Вес Sem = 2.4269
+   Сырые лоссы: BPR = 0.0654 | Sem = 0.4159
+   [Epoch 88] batch 50/172 | Loss: -1.6738 (BPR: 0.0604, Sem: 0.4178)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.7692 | Вес Sem = 2.4250
+   Сырые лоссы: BPR = 0.0625 | Sem = 0.4134
+   [Epoch 88] batch 100/172 | Loss: -1.7927 (BPR: 0.0538, Sem: 0.4085)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.6981 | Вес Sem = 2.4210
+   Сырые лоссы: BPR = 0.0782 | Sem = 0.4138
+   [Epoch 88] batch 150/172 | Loss: -1.5836 (BPR: 0.0677, Sem: 0.4104)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.6818 | Вес Sem = 2.4242
+   Сырые лоссы: BPR = 0.0720 | Sem = 0.4125
+🏁 [Epoch 88] Завершена! Суммарный лосс: -271.3940 (BPR: 11.6275, Sem: 71.0697)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.233), ('recall@50', 0.4794), ('ndcg@10', 0.1743), ('ndcg@50', 0.2432)])
+   [Epoch 89] batch 50/172 | Loss: -1.5059 (BPR: 0.0714, Sem: 0.4199)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 14.7191 | Вес Sem = 2.4236
+   Сырые лоссы: BPR = 0.0610 | Sem = 0.4148
+   [Epoch 89] batch 100/172 | Loss: -1.6169 (BPR: 0.0656, Sem: 0.4093)
+   [Epoch 89] batch 150/172 | Loss: -1.6912 (BPR: 0.0597, Sem: 0.4145)
+🏁 [Epoch 89] Завершена! Суммарный лосс: -271.4925 (BPR: 11.6261, Sem: 71.0366)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2324), ('recall@50', 0.4785), ('ndcg@10', 0.1748), ('ndcg@50', 0.2436)])
+   [Epoch 90] batch 50/172 | Loss: -1.6990 (BPR: 0.0598, Sem: 0.4108)
+   [Epoch 90] batch 100/172 | Loss: -1.6573 (BPR: 0.0626, Sem: 0.4112)
+   [Epoch 90] batch 150/172 | Loss: -1.5545 (BPR: 0.0693, Sem: 0.4122)
+🏁 [Epoch 90] Завершена! Суммарный лосс: -272.8886 (BPR: 11.5239, Sem: 71.0909)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2339), ('recall@50', 0.4797), ('ndcg@10', 0.1758), ('ndcg@50', 0.2445)])
+   [Epoch 91] batch 50/172 | Loss: -1.7574 (BPR: 0.0557, Sem: 0.4124)
+   [Epoch 91] batch 100/172 | Loss: -1.6278 (BPR: 0.0642, Sem: 0.4138)
+   [Epoch 91] batch 150/172 | Loss: -1.6603 (BPR: 0.0625, Sem: 0.4112)
+🏁 [Epoch 91] Завершена! Суммарный лосс: -277.4185 (BPR: 11.2306, Sem: 71.0411)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2334), ('recall@50', 0.4811), ('ndcg@10', 0.1758), ('ndcg@50', 0.2451)])
+   [Epoch 92] batch 50/172 | Loss: -1.6968 (BPR: 0.0600, Sem: 0.4117)
+   [Epoch 92] batch 100/172 | Loss: -1.6274 (BPR: 0.0637, Sem: 0.4173)
+   [Epoch 92] batch 150/172 | Loss: -1.5842 (BPR: 0.0676, Sem: 0.4104)
+🏁 [Epoch 92] Завершена! Суммарный лосс: -275.7307 (BPR: 11.3503, Sem: 70.9943)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2328), ('recall@50', 0.4803), ('ndcg@10', 0.1758), ('ndcg@50', 0.2451)])
+   [Epoch 93] batch 50/172 | Loss: -1.7100 (BPR: 0.0586, Sem: 0.4152)
+   [Epoch 93] batch 100/172 | Loss: -1.5244 (BPR: 0.0711, Sem: 0.4130)
+   [Epoch 93] batch 150/172 | Loss: -1.6990 (BPR: 0.0602, Sem: 0.4093)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.2290 | Вес Sem = 2.4238
+   Сырые лоссы: BPR = 0.0758 | Sem = 0.4163
+🏁 [Epoch 93] Завершена! Суммарный лосс: -278.0276 (BPR: 11.1863, Sem: 71.0774)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2342), ('recall@50', 0.4821), ('ndcg@10', 0.1762), ('ndcg@50', 0.2456)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.2943 | Вес Sem = 2.4177
+   Сырые лоссы: BPR = 0.0662 | Sem = 0.4231
+   [Epoch 94] batch 50/172 | Loss: -1.5739 (BPR: 0.0676, Sem: 0.4147)
+   [Epoch 94] batch 100/172 | Loss: -1.6994 (BPR: 0.0593, Sem: 0.4147)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.1694 | Вес Sem = 2.4283
+   Сырые лоссы: BPR = 0.0597 | Sem = 0.4119
+   [Epoch 94] batch 150/172 | Loss: -1.6295 (BPR: 0.0656, Sem: 0.4041)
+🏁 [Epoch 94] Завершена! Суммарный лосс: -275.4880 (BPR: 11.3641, Sem: 71.0083)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2346), ('recall@50', 0.481), ('ndcg@10', 0.1767), ('ndcg@50', 0.2457)])
+   [Epoch 95] batch 50/172 | Loss: -1.7965 (BPR: 0.0524, Sem: 0.4184)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.4250 | Вес Sem = 2.4192
+   Сырые лоссы: BPR = 0.0649 | Sem = 0.4134
+   [Epoch 95] batch 100/172 | Loss: -1.5730 (BPR: 0.0678, Sem: 0.4138)
+   [Epoch 95] batch 150/172 | Loss: -1.7744 (BPR: 0.0549, Sem: 0.4130)
+🏁 [Epoch 95] Завершена! Суммарный лосс: -280.0327 (BPR: 11.0488, Sem: 71.1253)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2352), ('recall@50', 0.4828), ('ndcg@10', 0.1774), ('ndcg@50', 0.2469)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.4685 | Вес Sem = 2.4099
+   Сырые лоссы: BPR = 0.0661 | Sem = 0.4108
+   [Epoch 96] batch 50/172 | Loss: -1.5629 (BPR: 0.0685, Sem: 0.4133)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.4817 | Вес Sem = 2.4218
+   Сырые лоссы: BPR = 0.0665 | Sem = 0.4057
+   [Epoch 96] batch 100/172 | Loss: -1.8035 (BPR: 0.0531, Sem: 0.4129)
+   [Epoch 96] batch 150/172 | Loss: -1.6177 (BPR: 0.0646, Sem: 0.4156)
+🏁 [Epoch 96] Завершена! Суммарный лосс: -279.6053 (BPR: 11.0839, Sem: 71.0823)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2352), ('recall@50', 0.4828), ('ndcg@10', 0.1769), ('ndcg@50', 0.2464)])
+   [Epoch 97] batch 50/172 | Loss: -1.5358 (BPR: 0.0697, Sem: 0.4163)
+   [Epoch 97] batch 100/172 | Loss: -1.6118 (BPR: 0.0653, Sem: 0.4137)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.5506 | Вес Sem = 2.4059
+   Сырые лоссы: BPR = 0.0590 | Sem = 0.4106
+   [Epoch 97] batch 150/172 | Loss: -1.6674 (BPR: 0.0620, Sem: 0.4116)
+🏁 [Epoch 97] Завершена! Суммарный лосс: -281.8906 (BPR: 10.9323, Sem: 71.1132)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2357), ('recall@50', 0.4833), ('ndcg@10', 0.1771), ('ndcg@50', 0.2466)])
+   [Epoch 98] batch 50/172 | Loss: -1.6540 (BPR: 0.0615, Sem: 0.4204)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.7413 | Вес Sem = 2.4195
+   Сырые лоссы: BPR = 0.0687 | Sem = 0.4143
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.7133 | Вес Sem = 2.4161
+   Сырые лоссы: BPR = 0.0632 | Sem = 0.4136
+   [Epoch 98] batch 100/172 | Loss: -1.7481 (BPR: 0.0567, Sem: 0.4132)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.7451 | Вес Sem = 2.4247
+   Сырые лоссы: BPR = 0.0632 | Sem = 0.4114
+   [Epoch 98] batch 150/172 | Loss: -1.8026 (BPR: 0.0537, Sem: 0.4103)
+🏁 [Epoch 98] Завершена! Суммарный лосс: -283.0341 (BPR: 10.8691, Sem: 71.0573)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2344), ('recall@50', 0.482), ('ndcg@10', 0.1768), ('ndcg@50', 0.2464)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.8888 | Вес Sem = 2.4163
+   Сырые лоссы: BPR = 0.0575 | Sem = 0.4100
+   [Epoch 99] batch 50/172 | Loss: -1.5832 (BPR: 0.0669, Sem: 0.4148)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.9984 | Вес Sem = 2.4129
+   Сырые лоссы: BPR = 0.0537 | Sem = 0.4142
+   [Epoch 99] batch 100/172 | Loss: -1.6485 (BPR: 0.0637, Sem: 0.4084)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.9396 | Вес Sem = 2.4248
+   Сырые лоссы: BPR = 0.0723 | Sem = 0.4173
+   [Epoch 99] batch 150/172 | Loss: -1.5742 (BPR: 0.0677, Sem: 0.4129)
+🏁 [Epoch 99] Завершена! Суммарный лосс: -284.9176 (BPR: 10.7504, Sem: 71.0575)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.236), ('recall@50', 0.4817), ('ndcg@10', 0.1773), ('ndcg@50', 0.2465)])
+   [Epoch 100] batch 50/172 | Loss: -1.6678 (BPR: 0.0623, Sem: 0.4099)
+   [Epoch 100] batch 100/172 | Loss: -1.6280 (BPR: 0.0634, Sem: 0.4188)
+   [Epoch 100] batch 150/172 | Loss: -1.6593 (BPR: 0.0622, Sem: 0.4137)
+🏁 [Epoch 100] Завершена! Суммарный лосс: -283.3341 (BPR: 10.8573, Sem: 71.0113)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2366), ('recall@50', 0.4829), ('ndcg@10', 0.178), ('ndcg@50', 0.2471)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 15.7917 | Вес Sem = 2.4236
+   Сырые лоссы: BPR = 0.0571 | Sem = 0.4127
+   [Epoch 101] batch 50/172 | Loss: -1.5036 (BPR: 0.0719, Sem: 0.4146)
+   [Epoch 101] batch 100/172 | Loss: -1.5699 (BPR: 0.0675, Sem: 0.4162)
+   [Epoch 101] batch 150/172 | Loss: -1.7258 (BPR: 0.0582, Sem: 0.4132)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 16.0669 | Вес Sem = 2.4201
+   Сырые лоссы: BPR = 0.0635 | Sem = 0.4114
+🏁 [Epoch 101] Завершена! Суммарный лосс: -286.0443 (BPR: 10.6937, Sem: 70.9658)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2368), ('recall@50', 0.4837), ('ndcg@10', 0.1785), ('ndcg@50', 0.2479)])
+   [Epoch 102] batch 50/172 | Loss: -1.7361 (BPR: 0.0580, Sem: 0.4102)
+   [Epoch 102] batch 100/172 | Loss: -1.6673 (BPR: 0.0618, Sem: 0.4134)
+   [Epoch 102] batch 150/172 | Loss: -1.5928 (BPR: 0.0671, Sem: 0.4092)
+🏁 [Epoch 102] Завершена! Суммарный лосс: -284.9191 (BPR: 10.7477, Sem: 71.0778)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2371), ('recall@50', 0.4846), ('ndcg@10', 0.1781), ('ndcg@50', 0.2478)])
+   [Epoch 103] batch 50/172 | Loss: -1.7213 (BPR: 0.0589, Sem: 0.4101)
+   [Epoch 103] batch 100/172 | Loss: -1.6704 (BPR: 0.0621, Sem: 0.4102)
+   [Epoch 103] batch 150/172 | Loss: -1.6267 (BPR: 0.0640, Sem: 0.4155)
+🏁 [Epoch 103] Завершена! Суммарный лосс: -288.4615 (BPR: 10.5204, Sem: 71.1217)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2378), ('recall@50', 0.4858), ('ndcg@10', 0.1789), ('ndcg@50', 0.2486)])
+   [Epoch 104] batch 50/172 | Loss: -1.7182 (BPR: 0.0591, Sem: 0.4103)
+   [Epoch 104] batch 100/172 | Loss: -1.6301 (BPR: 0.0639, Sem: 0.4148)
+   [Epoch 104] batch 150/172 | Loss: -1.7476 (BPR: 0.0568, Sem: 0.4137)
+🏁 [Epoch 104] Завершена! Суммарный лосс: -286.1490 (BPR: 10.6655, Sem: 71.1129)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2375), ('recall@50', 0.486), ('ndcg@10', 0.1781), ('ndcg@50', 0.2479)])
+   [Epoch 105] batch 50/172 | Loss: -1.7652 (BPR: 0.0557, Sem: 0.4142)
+   [Epoch 105] batch 100/172 | Loss: -1.6188 (BPR: 0.0653, Sem: 0.4100)
+   [Epoch 105] batch 150/172 | Loss: -1.8062 (BPR: 0.0532, Sem: 0.4135)
+🏁 [Epoch 105] Завершена! Суммарный лосс: -289.2859 (BPR: 10.4807, Sem: 71.0564)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.237), ('recall@50', 0.4862), ('ndcg@10', 0.178), ('ndcg@50', 0.2479)])
+   [Epoch 106] batch 50/172 | Loss: -1.7054 (BPR: 0.0596, Sem: 0.4122)
+   [Epoch 106] batch 100/172 | Loss: -1.8007 (BPR: 0.0543, Sem: 0.4094)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 16.5691 | Вес Sem = 2.4229
+   Сырые лоссы: BPR = 0.0594 | Sem = 0.4128
+   [Epoch 106] batch 150/172 | Loss: -1.7467 (BPR: 0.0567, Sem: 0.4152)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 16.6657 | Вес Sem = 2.4137
+   Сырые лоссы: BPR = 0.0601 | Sem = 0.4117
+🏁 [Epoch 106] Завершена! Суммарный лосс: -292.4864 (BPR: 10.2928, Sem: 71.0179)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2377), ('recall@50', 0.4874), ('ndcg@10', 0.179), ('ndcg@50', 0.2491)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 16.6813 | Вес Sem = 2.4138
+   Сырые лоссы: BPR = 0.0506 | Sem = 0.4176
+   [Epoch 107] batch 50/172 | Loss: -1.6543 (BPR: 0.0626, Sem: 0.4128)
+   [Epoch 107] batch 100/172 | Loss: -1.6755 (BPR: 0.0616, Sem: 0.4112)
+   [Epoch 107] batch 150/172 | Loss: -1.7094 (BPR: 0.0592, Sem: 0.4136)
+🏁 [Epoch 107] Завершена! Суммарный лосс: -291.8689 (BPR: 10.3226, Sem: 71.0724)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.239), ('recall@50', 0.487), ('ndcg@10', 0.1795), ('ndcg@50', 0.249)])
+   [Epoch 108] batch 50/172 | Loss: -1.7883 (BPR: 0.0543, Sem: 0.4147)
+   [Epoch 108] batch 100/172 | Loss: -1.6751 (BPR: 0.0618, Sem: 0.4100)
+   [Epoch 108] batch 150/172 | Loss: -1.5514 (BPR: 0.0687, Sem: 0.4129)
+🏁 [Epoch 108] Завершена! Суммарный лосс: -293.6898 (BPR: 10.2283, Sem: 70.9725)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2402), ('recall@50', 0.4875), ('ndcg@10', 0.1803), ('ndcg@50', 0.2496)])
+   [Epoch 109] batch 50/172 | Loss: -1.6970 (BPR: 0.0600, Sem: 0.4130)
+   [Epoch 109] batch 100/172 | Loss: -1.7061 (BPR: 0.0595, Sem: 0.4129)
+   [Epoch 109] batch 150/172 | Loss: -1.8918 (BPR: 0.0480, Sem: 0.4167)
+🏁 [Epoch 109] Завершена! Суммарный лосс: -295.2553 (BPR: 10.1366, Sem: 70.9658)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2391), ('recall@50', 0.4871), ('ndcg@10', 0.1798), ('ndcg@50', 0.2493)])
+   [Epoch 110] batch 50/172 | Loss: -1.7620 (BPR: 0.0562, Sem: 0.4133)
+   [Epoch 110] batch 100/172 | Loss: -1.5318 (BPR: 0.0696, Sem: 0.4137)
+   [Epoch 110] batch 150/172 | Loss: -1.7317 (BPR: 0.0583, Sem: 0.4106)
+🏁 [Epoch 110] Завершена! Суммарный лосс: -295.2387 (BPR: 10.1259, Sem: 71.0483)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2402), ('recall@50', 0.4882), ('ndcg@10', 0.1804), ('ndcg@50', 0.2498)])
+   [Epoch 111] batch 50/172 | Loss: -1.8122 (BPR: 0.0530, Sem: 0.4150)
+   [Epoch 111] batch 100/172 | Loss: -1.6076 (BPR: 0.0655, Sem: 0.4111)
+   [Epoch 111] batch 150/172 | Loss: -1.7999 (BPR: 0.0543, Sem: 0.4112)
+🏁 [Epoch 111] Завершена! Суммарный лосс: -296.5641 (BPR: 10.0467, Sem: 71.0563)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2403), ('recall@50', 0.4901), ('ndcg@10', 0.1803), ('ndcg@50', 0.2501)])
+   [Epoch 112] batch 50/172 | Loss: -1.5999 (BPR: 0.0652, Sem: 0.4166)
+   [Epoch 112] batch 100/172 | Loss: -1.6946 (BPR: 0.0604, Sem: 0.4115)
+   [Epoch 112] batch 150/172 | Loss: -1.8724 (BPR: 0.0494, Sem: 0.4155)
+🏁 [Epoch 112] Завершена! Суммарный лосс: -297.3918 (BPR: 10.0071, Sem: 70.9961)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2405), ('recall@50', 0.4909), ('ndcg@10', 0.181), ('ndcg@50', 0.251)])
+   [Epoch 113] batch 50/172 | Loss: -1.5937 (BPR: 0.0659, Sem: 0.4142)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.1913 | Вес Sem = 2.4255
+   Сырые лоссы: BPR = 0.0540 | Sem = 0.4110
+   [Epoch 113] batch 100/172 | Loss: -1.7308 (BPR: 0.0583, Sem: 0.4112)
+   [Epoch 113] batch 150/172 | Loss: -1.7150 (BPR: 0.0586, Sem: 0.4153)
+🏁 [Epoch 113] Завершена! Суммарный лосс: -298.5662 (BPR: 9.9366, Sem: 71.0147)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2415), ('recall@50', 0.4923), ('ndcg@10', 0.1814), ('ndcg@50', 0.2513)])
+   [Epoch 114] batch 50/172 | Loss: -1.6119 (BPR: 0.0646, Sem: 0.4152)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.3396 | Вес Sem = 2.4235
+   Сырые лоссы: BPR = 0.0577 | Sem = 0.4137
+   [Epoch 114] batch 100/172 | Loss: -1.8175 (BPR: 0.0525, Sem: 0.4167)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.4202 | Вес Sem = 2.4154
+   Сырые лоссы: BPR = 0.0660 | Sem = 0.4140
+   [Epoch 114] batch 150/172 | Loss: -1.5061 (BPR: 0.0708, Sem: 0.4138)
+🏁 [Epoch 114] Завершена! Суммарный лосс: -298.7888 (BPR: 9.9177, Sem: 71.0569)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2417), ('recall@50', 0.4915), ('ndcg@10', 0.1811), ('ndcg@50', 0.251)])
+   [Epoch 115] batch 50/172 | Loss: -1.6600 (BPR: 0.0622, Sem: 0.4127)
+   [Epoch 115] batch 100/172 | Loss: -1.6344 (BPR: 0.0639, Sem: 0.4108)
+   [Epoch 115] batch 150/172 | Loss: -1.7400 (BPR: 0.0571, Sem: 0.4158)
+🏁 [Epoch 115] Завершена! Суммарный лосс: -297.9204 (BPR: 9.9711, Sem: 71.0337)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2421), ('recall@50', 0.4906), ('ndcg@10', 0.1813), ('ndcg@50', 0.2508)])
+   [Epoch 116] batch 50/172 | Loss: -1.7721 (BPR: 0.0555, Sem: 0.4141)
+   [Epoch 116] batch 100/172 | Loss: -1.7169 (BPR: 0.0591, Sem: 0.4110)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.4894 | Вес Sem = 2.4249
+   Сырые лоссы: BPR = 0.0594 | Sem = 0.4132
+   [Epoch 116] batch 150/172 | Loss: -1.7422 (BPR: 0.0575, Sem: 0.4122)
+🏁 [Epoch 116] Завершена! Суммарный лосс: -300.8738 (BPR: 9.8086, Sem: 70.9783)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.241), ('recall@50', 0.4906), ('ndcg@10', 0.1802), ('ndcg@50', 0.2502)])
+   [Epoch 117] batch 50/172 | Loss: -1.7418 (BPR: 0.0571, Sem: 0.4150)
+   [Epoch 117] batch 100/172 | Loss: -1.8195 (BPR: 0.0531, Sem: 0.4124)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.6053 | Вес Sem = 2.4244
+   Сырые лоссы: BPR = 0.0540 | Sem = 0.4134
+   [Epoch 117] batch 150/172 | Loss: -1.5702 (BPR: 0.0665, Sem: 0.4177)
+🏁 [Epoch 117] Завершена! Суммарный лосс: -300.5481 (BPR: 9.8158, Sem: 71.0622)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2398), ('recall@50', 0.4905), ('ndcg@10', 0.18), ('ndcg@50', 0.2503)])
+   [Epoch 118] batch 50/172 | Loss: -1.5917 (BPR: 0.0656, Sem: 0.4163)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.5768 | Вес Sem = 2.4167
+   Сырые лоссы: BPR = 0.0562 | Sem = 0.4154
+   [Epoch 118] batch 100/172 | Loss: -1.6868 (BPR: 0.0604, Sem: 0.4138)
+   [Epoch 118] batch 150/172 | Loss: -1.6398 (BPR: 0.0633, Sem: 0.4122)
+🏁 [Epoch 118] Завершена! Суммарный лосс: -302.0099 (BPR: 9.7353, Sem: 71.0441)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2417), ('recall@50', 0.4922), ('ndcg@10', 0.1806), ('ndcg@50', 0.2508)])
+   [Epoch 119] batch 50/172 | Loss: -1.8706 (BPR: 0.0498, Sem: 0.4158)
+   [Epoch 119] batch 100/172 | Loss: -1.9673 (BPR: 0.0448, Sem: 0.4126)
+   [Epoch 119] batch 150/172 | Loss: -1.6223 (BPR: 0.0643, Sem: 0.4113)
+🏁 [Epoch 119] Завершена! Суммарный лосс: -303.9027 (BPR: 9.6278, Sem: 71.0505)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2396), ('recall@50', 0.4925), ('ndcg@10', 0.1796), ('ndcg@50', 0.2506)])
+   [Epoch 120] batch 50/172 | Loss: -1.9034 (BPR: 0.0488, Sem: 0.4101)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.8512 | Вес Sem = 2.4237
+   Сырые лоссы: BPR = 0.0482 | Sem = 0.4154
+   [Epoch 120] batch 100/172 | Loss: -1.7880 (BPR: 0.0544, Sem: 0.4163)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.8432 | Вес Sem = 2.4154
+   Сырые лоссы: BPR = 0.0500 | Sem = 0.4132
+   [Epoch 120] batch 150/172 | Loss: -1.6262 (BPR: 0.0639, Sem: 0.4137)
+🏁 [Epoch 120] Завершена! Суммарный лосс: -302.0609 (BPR: 9.7286, Sem: 71.0743)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2393), ('recall@50', 0.4934), ('ndcg@10', 0.1791), ('ndcg@50', 0.2503)])
+   [Epoch 121] batch 50/172 | Loss: -1.7844 (BPR: 0.0546, Sem: 0.4158)
+   [Epoch 121] batch 100/172 | Loss: -1.9503 (BPR: 0.0454, Sem: 0.4153)
+   [Epoch 121] batch 150/172 | Loss: -1.8553 (BPR: 0.0505, Sem: 0.4168)
+🏁 [Epoch 121] Завершена! Суммарный лосс: -305.3812 (BPR: 9.5529, Sem: 70.9898)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2399), ('recall@50', 0.4929), ('ndcg@10', 0.1798), ('ndcg@50', 0.2508)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.9406 | Вес Sem = 2.4294
+   Сырые лоссы: BPR = 0.0496 | Sem = 0.4061
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.9960 | Вес Sem = 2.4243
+   Сырые лоссы: BPR = 0.0593 | Sem = 0.4118
+   [Epoch 122] batch 50/172 | Loss: -1.7463 (BPR: 0.0563, Sem: 0.4188)
+   [Epoch 122] batch 100/172 | Loss: -1.7988 (BPR: 0.0542, Sem: 0.4133)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 18.1128 | Вес Sem = 2.4170
+   Сырые лоссы: BPR = 0.0611 | Sem = 0.4089
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 18.1668 | Вес Sem = 2.4200
+   Сырые лоссы: BPR = 0.0569 | Sem = 0.4187
+   [Epoch 122] batch 150/172 | Loss: -1.6268 (BPR: 0.0636, Sem: 0.4136)
+🏁 [Epoch 122] Завершена! Суммарный лосс: -305.8282 (BPR: 9.5207, Sem: 71.0506)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2414), ('recall@50', 0.4944), ('ndcg@10', 0.1806), ('ndcg@50', 0.2517)])
+   [Epoch 123] batch 50/172 | Loss: -1.7978 (BPR: 0.0543, Sem: 0.4125)
+   [Epoch 123] batch 100/172 | Loss: -1.7452 (BPR: 0.0567, Sem: 0.4167)
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 17.8971 | Вес Sem = 2.4290
+   Сырые лоссы: BPR = 0.0637 | Sem = 0.4114
+   [Epoch 123] batch 150/172 | Loss: -1.8121 (BPR: 0.0539, Sem: 0.4102)
+🏁 [Epoch 123] Завершена! Суммарный лосс: -307.2419 (BPR: 9.4495, Sem: 71.0016)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2413), ('recall@50', 0.4948), ('ndcg@10', 0.1805), ('ndcg@50', 0.2518)])
+
+⚖️ АВТО-БАЛАНС: Вес BPR = 18.4387 | Вес Sem = 2.4127
+   Сырые лоссы: BPR = 0.0587 | Sem = 0.4136
+   [Epoch 124] batch 50/172 | Loss: -1.8402 (BPR: 0.0522, Sem: 0.4114)
+   [Epoch 124] batch 100/172 | Loss: -1.9574 (BPR: 0.0452, Sem: 0.4163)
+   [Epoch 124] batch 150/172 | Loss: -1.9446 (BPR: 0.0465, Sem: 0.4109)
+🏁 [Epoch 124] Завершена! Суммарный лосс: -308.4177 (BPR: 9.3762, Sem: 71.0683)
+📈 [Validation] Метрики: OrderedDict([('recall@10', 0.2412), ('recall@50', 0.4952), ('ndcg@10', 0.1806), ('ndcg@50', 0.2518)])
+
+🏁 Глобальные метрики (Dynamic Leaky Log):
+OrderedDict([('recall@10', 0.2464), ('recall@50', 0.4863), ('ndcg@10', 0.1962), ('ndcg@50', 0.2597)])
+
+📊 REPORT: Dynamic Leaky Log
+
+==================================================
+📊 СТРАТИФИЦИРОВАННЫЙ АНАЛИЗ (HEAD / TORSO / TAIL)
+🎬 Распределение базы (4750 фильмов):
+   - Head (Топ 20%): 950 элементов
+   - Torso (Средние 30%): 1425 элементов
+   - Tail (Редкие 50%): 2375 элементов
+
+🔍 Оценка на выборке из 9643 пользователей...
+C:\research\.venv\Lib\site-packages\recbole\utils\case_study.py:39: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.detach().clone() or sourceTensor.detach().clone().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  uid_series = torch.tensor(uid_series)
+
+📈 Результаты Recall@10:
+   - Head: 0.2245 (Hits: 8295/36952)
+   - Torso: 0.0163 (Hits: 73/4466)
+   - Tail: 0.0000 (Hits: 0/858)
+==================================================
+

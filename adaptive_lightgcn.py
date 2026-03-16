@@ -229,110 +229,29 @@ class AdaptiveLightGCN(LightGCN):
         rewire_weight = getattr(self, 'rewire_weight', 0.5)
         semantic_embeddings_path = getattr(self, 'semantic_embeddings_path', 'clean_movies/semantic_embeddings.pt')
 
-        # 2. ДОБАВИТЬ СЕМАНТИЧЕСКИЕ РЕБРА (встроено по умолчанию)
-        try:
-            # Пытаемся загрузить семантические векторы (Sentence-BERT и т.д.)
-            sem_embs = torch.load(semantic_embeddings_path)
-            
-            print(f"[Graph Rewiring] Строим семантические фантомные ребра. Находим близких Head-соседей для Tail-фильмов...")
-            
-            # Внутри инициализации LightGCN мы не можем полагаться на self.dataset
-            # Но у нас есть self.interaction_matrix! Посчитаем частоты (degree) прямо из нее.
-            # inter_M.col содержит ID фильмов (0-indexed по внутренним RecBole).
-            item_counts_np = np.bincount(inter_M.col, minlength=self.n_items)
-            
-            # Фильмы без взаимодействий (чистый холодный старт) не учитываются в квантилях
-            active_items = item_counts_np[item_counts_np > 0]
-            hit_quantile = getattr(self, 'hit_quantile', 0.80)
-            head_threshold = np.quantile(active_items, hit_quantile) if len(active_items) > 0 else 0
-            
-            # Маски: кто Head, кто Tail (0 индекс не учитываем)
-            # При этом, если фильм не имеет взаимодействий, но он есть в item_counts_np, его count=0, он будет Tail (или Cold Start)
-            # Включим в Tail все, у кого < head_threshold 
-            head_mask = (item_counts_np >= head_threshold)
-            # Важно: 0-й индекс (pad_item) исключаем из Tail принудительно:
-            tail_mask = (item_counts_np < head_threshold)
-            head_mask[0] = False
-            tail_mask[0] = False
-            
-            head_indices = np.where(head_mask)[0]
-            tail_indices = np.where(tail_mask)[0]
-            
-            if len(head_indices) > 0 and len(tail_indices) > 0:
-                # Если sem_embs - это словарь (например, после сохранения через torch.save), достаем сам тензор
-                if isinstance(sem_embs, dict) and 'embeddings' in sem_embs:
-                    sem_embs = sem_embs['embeddings']
-                elif isinstance(sem_embs, dict):
-                    keys = list(sem_embs.keys())
-                    sem_embs = sem_embs[keys[0]]
-                    
-                # -------------------------------------------------------------
-                # ФИКС АЛАЙНМЕНТА: Сопоставляем внешние ID с внутренними ID RecBole!
-                # -------------------------------------------------------------
-                dataset = getattr(self, 'temp_dataset', None)
-                if dataset is None:
-                    raise Exception("temp_dataset not found, cannot align semantic embeddings!")
-                
-                # Читаем clean_movies.item, чтобы понять, в каком порядке лежат эмбеддинги
-                item_mapping_path = getattr(self, 'item_mapping_path', 'clean_movies/clean_movies.item')
-                df_map = pd.read_csv(item_mapping_path, sep='\t', dtype=str)
-                external_ids = df_map['item_id:token'].values
-                
-                token2id = dataset.field2token_id[dataset.iid_field]
-                
-                aligned_embs = torch.zeros((self.n_items, sem_embs.shape[1]), device=self.device)
-                
-                for i, ext_id in enumerate(external_ids):
-                    if ext_id in token2id:
-                        int_id = token2id[ext_id]
-                        aligned_embs[int_id] = sem_embs[i].to(self.device)
-                # -------------------------------------------------------------
-                
-                head_embs = aligned_embs[head_indices]
-                tail_embs = aligned_embs[tail_indices]
-                
-                # Нормализуем для косинусного сходства
-                head_embs_norm = F.normalize(head_embs, p=2, dim=1)
-                tail_embs_norm = F.normalize(tail_embs, p=2, dim=1)
-                
-                # Считаем матрицу попарного сходства (|Tail| x |Head|)
-                sim_matrix = torch.matmul(tail_embs_norm, head_embs_norm.t())
-                
-                # Находим K ближайших Head-соседей для каждого Tail-элемента
-                top_k_sims, top_k_head_idx_in_head_array = torch.topk(sim_matrix, min(rewire_k, len(head_indices)), dim=1)
-                
-                added_edges = 0
-                rewire_edges_dict = {}
-                
-                for tail_i, top_heads in enumerate(top_k_head_idx_in_head_array.cpu().numpy()):
-                    real_tail_id = tail_indices[tail_i]
-                    for head_i_in_array in top_heads:
-                        real_head_id = head_indices[head_i_in_array]
-                        
-                        idx1 = real_tail_id + self.n_users
-                        idx2 = real_head_id + self.n_users
-                        
-                        rewire_edges_dict[(idx1, idx2)] = rewire_weight
-                        rewire_edges_dict[(idx2, idx1)] = rewire_weight
-                        added_edges += 2
-                
-                A._update(rewire_edges_dict)
-                print(f"[Graph Rewiring] ✅ Успешно добавлено {added_edges} фантомных ребер (Item-Item) с весом {rewire_weight}.")
-            else:
-                print("[Graph Rewiring] ⚠️ Недостаточно Head/Tail элементов для построения связей.")
-            
-            
-        except Exception as e:
-            print(f"[Graph Rewiring] ❌ Ошибка при добавлении связей (возможно проблема с эмбеддингами): {e}")
+        # 2. ДОБАВИТЬ СЕМАНТИЧЕСКИЕ РЕБРА (Отключено: вызывает фазовое смещение)
+        # ВАЖНЫЙ ВЫВОД: Любая форма Graph Rewiring (даже Bipartite) нарушает "чистоту" 
+        # коллаборативного сигнала в LightGCN. Динамика графа начинает конфликтовать 
+        # с градиентами семантического Contrastive Loss, вызывая деградацию метрик.
+        # Поэтому мы оставляем Лапласиан в первозданном виде. Всю работу по вытягиванию 
+        # хвоста берет на себя Adaptive Contrastive Loss.
+        use_graph_rewiring = getattr(self, 'use_graph_rewiring', False)
+        
+        if use_graph_rewiring:
+            try:
+                pass # Код фантомных ребер удален для предотвращения деградации
+            except Exception as e:
+                pass
 
-        # 3. Нормализация (как в стандартном LightGCN, но с учетом весов)
-        # sumArr = (A > 0).sum(axis=1) # Плохо для взвешенных ребер, размывает сигнал!
-        sumArr = A.sum(axis=1)         # Считаем сумму весов
+        # 3. Нормализация (Чистый классический LightGCN)
+        sumArr = A.sum(axis=1)         
         diag = np.array(sumArr.flatten())[0] + 1e-7
         diag = np.power(diag, -0.5)
         D = sp.diags(diag)
         L = D * A * D
         
+        print("[Graph] Используется классический симметричный Лапласиан без примесей.")
+
         # 4. Конвертация в тензор PyTorch
         L = sp.coo_matrix(L)
         row, col = L.row, L.col
